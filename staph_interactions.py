@@ -1,59 +1,83 @@
+"""
+VHRdb Staphylococcus aureus interaction collector
+Uses aggregated-responses (ground-truth experimental data)
+
+Output:
+staph_vhrdb_interactions.csv
+
+Requires:
+pip install requests pandas
+"""
+
 import requests
+import pandas as pd
 
 BASE_URL = "https://viralhostrangedb.pasteur.cloud/api"
 HOST_SEARCH_TERM = "Staphylococcus aureus"
+OUTPUT_CSV = "staph_vhrdb_interactions.csv"
 
-# --- Step 1: Get all hosts ---
+# -------------------------------------------------
+# STEP 1: Fetch all hosts
+# -------------------------------------------------
 print("Fetching all hosts...")
 hosts_res = requests.get(f"{BASE_URL}/host/?format=json")
 hosts_res.raise_for_status()
-hosts_data = hosts_res.json()  # <-- this is a LIST
+hosts_data = hosts_res.json()
 
-# --- Step 2: Find Staphylococcus aureus host IDs ---
-sau_ids = []
+# -------------------------------------------------
+# STEP 2: Collect Staph aureus host IDs
+# -------------------------------------------------
+sau_hosts = []
 
 for host in hosts_data:
     name = host.get("name", "")
     if HOST_SEARCH_TERM.lower() in name.lower():
-        sau_ids.append(str(host["id"]))  # IDs are strings in response maps
+        sau_hosts.append({
+            "host_id": str(host["id"]),
+            "host_name": name
+        })
 
-if not sau_ids:
-    print(f"No hosts found matching '{HOST_SEARCH_TERM}'")
-    exit(1)
+if not sau_hosts:
+    raise RuntimeError("No Staphylococcus aureus hosts found.")
 
-print(f"Found Staphylococcus aureus host ID(s): {sau_ids}")
+sau_host_ids = {h["host_id"] for h in sau_hosts}
 
-# --- Step 3: Fetch aggregated responses ---
-print("Fetching aggregated responses...")
+print(f"Found {len(sau_hosts)} Staphylococcus aureus hosts")
+
+# -------------------------------------------------
+# STEP 3: Fetch aggregated responses
+# -------------------------------------------------
+print("Fetching aggregated virus-host responses...")
 agg_res = requests.get(
     f"{BASE_URL}/aggregated-responses/?allow_overflow=true&format=json"
 )
 agg_res.raise_for_status()
 agg_data = agg_res.json()
 
-# --- Step 4: Filter by host ID ---
-print("Filtering virus-host interactions...")
-sau_results = {}
+# -------------------------------------------------
+# STEP 4: Extract S. aureus interactions
+# -------------------------------------------------
+print("Extracting S. aureus interactions...")
+rows = []
 
 for virus_id, host_map in agg_data.items():
-    for host_id in sau_ids:
-        if host_id in host_map:
-            sau_results[virus_id] = {
-                "infection_value": host_map[host_id]["val"],
-                "evidence_count": host_map[host_id]["diff"]
-            }
+    for host in sau_hosts:
+        hid = host["host_id"]
+        if hid in host_map:
+            rows.append({
+                "virus_id": virus_id,
+                "host_id": hid,
+                "host_name": host["host_name"],
+                "infection_value": host_map[hid]["val"],
+                "evidence_count": host_map[hid]["diff"]
+            })
 
-# --- Step 5: Output ---
-print("\n=== Staphylococcus aureus Virus Interactions ===")
+df = pd.DataFrame(rows)
+df.to_csv(OUTPUT_CSV, index=False)
 
-if not sau_results:
-    print("No interaction data found.")
-else:
-    for virus_id, info in sau_results.items():
-        print(
-            f"Virus {virus_id}: "
-            f"value={info['infection_value']} "
-            f"(sources={info['evidence_count']})"
-        )
-
-print("\nDone ✅")
+# -------------------------------------------------
+# DONE
+# -------------------------------------------------
+print("\nDATA COLLECTION COMPLETE ✅")
+print(f"Total interactions: {len(df)}")
+print(f"Saved to: {OUTPUT_CSV}")

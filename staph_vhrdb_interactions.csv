@@ -1,0 +1,13 @@
+virus_id,host_id,host_name,infection_value,evidence_count
+945,2767,Staphylococcus aureus 68,2.0,1
+997,2799,Staphylococcus aureus 44A,2.0,1
+1174,2944,Staphylococcus aureus 3A,2.0,1
+1175,2945,Staphylococcus aureus 77,2.0,1
+1187,2956,Staphylococcus aureus 71,2.0,1
+1188,2957,Staphylococcus aureus 187,2.0,1
+1228,2993,Staphylococcus aureus 2854,2.0,1
+1401,3118,Staphylococcus aureus DPC5246,2.0,1
+1402,3118,Staphylococcus aureus DPC5246,2.0,1
+1405,3120,Staphylococcus aureus,2.0,1
+1406,3120,Staphylococcus aureus,2.0,1
+1420,3131,Staphylococcus aureus PS47,2.0,1
