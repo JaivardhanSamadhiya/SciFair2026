@@ -1,0 +1,11 @@
+,value
+k1_vs_k3_p,1.0438244869605198e-14
+k1_vs_k5_p,1.2046818032024613e-14
+greedy_vs_random_p,1.7105183955145972e-15
+topk_vs_random_p,0.0013961862885908448
+greedy_vs_topk_p,9.815090174481739e-12
+divgreedy_vs_greedy_p,1.0
+resistance_p,1.0438244869605198e-14
+strain_vs_interaction_p,2.426733577013426e-14
+s_greedy_over_random@3,0.410465189745989
+s_divgr_over_greedy@3,0.0

@@ -1,0 +1,93 @@
+,n_test,n_pos,roc_auc,genus
+achromobacter xylosoxidans,8,7,1.0,achromobacter
+enterococcus faecalis,52,33,1.0,enterococcus
+lactobacillus casei,8,4,1.0,lactobacillus
+lactobacillus paracasei,8,7,1.0,lactobacillus
+listeria monocytogenes,43,24,1.0,listeria
+pseudomonas aeruginosa,143,129,1.0,pseudomonas
+pseudomonas fluorescens,12,8,1.0,pseudomonas
+rhizobium etli,5,3,1.0,rhizobium
+rhodococcus erythropolis,6,4,1.0,rhodococcus
+serratia marcescens,7,2,1.0,serratia
+shewanella sp. 10n.7,26,2,1.0,shewanella
+acinetobacter baumannii,39,35,1.0,acinetobacter
+staphylococcus hominis,41,2,1.0,staphylococcus
+staphylococcus pseudintermedius,39,1,1.0,staphylococcus
+streptococcus salivarius,6,1,1.0,streptococcus
+streptomyces griseus,12,11,1.0,streptomyces
+vibrio alginolyticus,85,4,1.0,vibrio
+vibrio anguillarum,97,1,1.0,vibrio
+vibrio vulnificus,97,4,1.0,vibrio
+enterococcus faecium,6,4,1.0,enterococcus
+sinorhizobium meliloti,7,5,1.0,sinorhizobium
+bacillus subtilis,41,21,1.0,bacillus
+aeromonas salmonicida,13,11,1.0,aeromonas
+brevibacillus laterosporus,8,7,1.0,brevibacillus
+aeromonas hydrophila,5,3,1.0,aeromonas
+burkholderia cepacia,8,7,1.0,burkholderia
+clostridium perfringens,14,12,1.0,clostridium
+clostridium difficile,18,16,1.0,clostridium
+bacillus megaterium,25,16,0.9930555555555555,bacillus
+vibrio sp. 10n.3,107,1,0.9905660377358491,vibrio
+escherichia coli,248,222,0.987006237006237,escherichia
+lactococcus lactis,58,53,0.9849056603773585,lactococcus
+gordonia terrae,64,63,0.9841269841269841,gordonia
+shigella sonnei,17,12,0.9833333333333334,shigella
+shigella flexneri,25,20,0.9800000000000001,shigella
+staphylococcus pasteuri,41,3,0.9736842105263158,staphylococcus
+vibrio sp. f12,101,22,0.9723820483314155,vibrio
+citrobacter freundii,19,14,0.9714285714285714,citrobacter
+salmonella enterica,89,73,0.9700342465753424,salmonella
+vibrio parahaemolyticus,110,18,0.9698067632850242,vibrio
+staphylococcus xylosus,40,28,0.9672619047619048,staphylococcus
+staphylococcus aureus,150,112,0.962640977443609,staphylococcus
+staphylococcus vitulinus,39,29,0.9620689655172414,staphylococcus
+staphylococcus auricularis,39,4,0.9571428571428571,staphylococcus
+bacillus cereus,33,23,0.9434782608695652,bacillus
+klebsiella pneumoniae,40,30,0.9433333333333334,klebsiella
+enterobacter cloacae,8,4,0.9375,enterobacter
+cronobacter sakazakii,19,15,0.9333333333333333,cronobacter
+pseudomonas putida,11,7,0.9285714285714286,pseudomonas
+bacillus pumilus,14,10,0.925,bacillus
+staphylococcus equorum,39,20,0.9210526315789473,staphylococcus
+staphylococcus hyicus,39,6,0.904040404040404,staphylococcus
+enterobacter aerogenes,9,4,0.9,enterobacter
+staphylococcus succinus,39,19,0.8894736842105263,staphylococcus
+staphylococcus cohnii,40,16,0.8828125,staphylococcus
+staphylococcus pettenkoferi,39,4,0.8714285714285714,staphylococcus
+vibrio sp. 10n.4,83,2,0.8641975308641976,vibrio
+enterovibrio norvegicus,60,12,0.8420138888888888,enterovibrio
+staphylococcus capitis,40,18,0.8409090909090908,staphylococcus
+staphylococcus chromogenes,39,20,0.8342105263157895,staphylococcus
+vibrio sp. 10n.5,108,1,0.8317757009345794,vibrio
+vibrio tasmaniensis,85,3,0.8292682926829269,vibrio
+vibrio sp. 10n.2,99,3,0.8125,vibrio
+shigella boydii,10,3,0.8095238095238095,shigella
+bacillus thuringiensis,45,41,0.8048780487804879,bacillus
+vibrio splendidus,138,53,0.7955604883462819,vibrio
+shewanella sp. 10n.6,23,7,0.7857142857142857,shewanella
+staphylococcus lugdunensis,39,22,0.7834224598930482,staphylococcus
+vibrio sp. 10n.1,91,7,0.7755102040816326,vibrio
+staphylococcus schleiferi,39,25,0.7657142857142858,staphylococcus
+leuconostoc pseudomesenteroides,9,5,0.75,leuconostoc
+bacillus weihenstephanensis,7,3,0.75,bacillus
+vibrio sp. f13,93,8,0.75,vibrio
+bacillus anthracis,12,10,0.75,bacillus
+vibrio kanaloae,93,2,0.7472527472527473,vibrio
+yersinia enterocolitica,12,9,0.7407407407407408,yersinia
+proteus mirabilis,13,11,0.7272727272727273,proteus
+staphylococcus epidermidis,59,35,0.6845238095238095,staphylococcus
+staphylococcus lentus,39,10,0.6758620689655173,staphylococcus
+staphylococcus warneri,40,4,0.6666666666666666,staphylococcus
+staphylococcus fleuretti,39,7,0.6294642857142857,staphylococcus
+vibrio cyclitrophicus,125,50,0.6293333333333334,vibrio
+staphylococcus saprophyticus,40,3,0.5585585585585585,staphylococcus
+staphylococcus haemolyticus,42,6,0.5509259259259259,staphylococcus
+staphylococcus kloosii,39,17,0.5508021390374331,staphylococcus
+vibrio lentus,144,96,0.5418836805555556,vibrio
+bacillus licheniformis,5,1,0.5,bacillus
+vibrio breoganii,125,52,0.3785563751317176,vibrio
+staphylococcus sciuri,39,25,0.34285714285714286,staphylococcus
+staphylococcus caprae,39,2,0.21621621621621617,staphylococcus
+leuconostoc mesenteroides,14,8,0.14583333333333331,leuconostoc
+pantoea agglomerans,6,4,0.0,pantoea

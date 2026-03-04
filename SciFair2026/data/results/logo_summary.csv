@@ -1,0 +1,8 @@
+,value
+logo_mean_auc,0.9051617693141755
+logo_std_auc,0.15719299243503362
+logo_pooled_auc,0.9107333112491226
+loso_mean_auc,0.8505588789592252
+delta_logo_minus_loso,0.05460289035495025
+wilcoxon_p,0.5456695556640625
+n_genera_evaluated,44.0
