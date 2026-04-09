@@ -1,0 +1,11 @@
+model,metric,mean,ci_lo,ci_hi,n_species
+GAT+Edge MLP,roc_auc,0.9801,0.9721,0.987,166
+GAT+Edge MLP,pr_auc,0.9244,0.8968,0.9487,166
+SAGE+Residual,roc_auc,0.9837,0.9775,0.9892,166
+SAGE+Residual,pr_auc,0.9331,0.9068,0.9566,166
+XGBoost,roc_auc,0.8853,0.8596,0.9096,166
+XGBoost,pr_auc,0.8007,0.757,0.8423,166
+RandomForest,roc_auc,0.8882,0.8629,0.9125,166
+RandomForest,pr_auc,0.8016,0.7593,0.8425,166
+GBM,roc_auc,0.8808,0.8544,0.9057,166
+GBM,pr_auc,0.7878,0.7435,0.8306,166

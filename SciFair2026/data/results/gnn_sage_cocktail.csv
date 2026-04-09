@@ -1,0 +1,167 @@
+species,single_cov,topk_cov,random_cov,greedy_cov
+achromobacter_xylosoxidans,1.0,1.0,0.6944444444444444,1.0
+acinetobacter_baumannii,1.0,1.0,0.8888888888888888,1.0
+acinetobacter_johnsonii,1.0,1.0,0.1111111111111111,1.0
+aeromonas_hydrophila,1.0,1.0,0.3333333333333333,1.0
+aeromonas_salmonicida,1.0,1.0,0.6666666666666666,1.0
+bacillus_anthracis,1.0,1.0,0.6944444444444444,1.0
+bacillus_cereus,1.0,1.0,0.75,1.0
+bacillus_megaterium,1.0,1.0,0.6944444444444444,1.0
+bacillus_pumilus,1.0,1.0,0.7777777777777778,1.0
+bacillus_subtilis,1.0,1.0,0.6111111111111112,1.0
+bacillus_thuringiensis,1.0,1.0,0.9444444444444444,1.0
+bacillus_weihenstephanensis,1.0,1.0,0.2777777777777778,1.0
+bdellovibrio_bacteriovorus,1.0,1.0,0.3333333333333333,1.0
+brevibacillus_laterosporus,1.0,1.0,0.3611111111111111,1.0
+brochothrix_thermosphacta,1.0,1.0,0.3055555555555556,1.0
+burkholderia_cenocepacia,1.0,1.0,0.6111111111111112,1.0
+burkholderia_cepacia,1.0,1.0,0.6944444444444444,1.0
+burkholderia_pseudomallei,1.0,1.0,0.6111111111111112,1.0
+burkholderia_thailandensis,1.0,1.0,0.4444444444444444,1.0
+campylobacter_jejuni,1.0,1.0,0.5833333333333334,1.0
+caulobacter_crescentus,1.0,1.0,0.7222222222222222,1.0
+cellulophaga_baltica,1.0,1.0,0.8611111111111112,1.0
+chlamydia_psittaci,1.0,1.0,0.2777777777777778,1.0
+citrobacter_freundii,1.0,1.0,0.7777777777777778,1.0
+clostridium_difficile,1.0,1.0,0.8611111111111112,1.0
+clostridium_perfringens,1.0,1.0,0.6944444444444444,1.0
+clostridium_tetani,1.0,1.0,0.6388888888888888,1.0
+corynebacterium_glutamicum,1.0,1.0,0.2777777777777778,1.0
+corynebacterium_vitaeruminis,1.0,1.0,0.6388888888888888,1.0
+cronobacter_malonaticus,1.0,1.0,0.3611111111111111,1.0
+cronobacter_sakazakii,1.0,1.0,0.75,1.0
+edwardsiella_ictaluri,1.0,1.0,0.3055555555555556,1.0
+enterobacter_aerogenes,1.0,1.0,0.25,1.0
+enterobacter_cloacae,0.0,1.0,0.3611111111111111,1.0
+enterococcus_faecalis,1.0,1.0,0.8611111111111112,1.0
+enterococcus_faecium,1.0,1.0,0.3611111111111111,1.0
+enterovibrio norvegicus,0.25,0.25,0.05555555555555555,0.75
+erwinia_amylovora,1.0,1.0,0.8888888888888888,1.0
+escherichia_coli,1.0,1.0,1.0,1.0
+flavobacterium_psychrophilum,1.0,1.0,0.75,1.0
+gordonia_malaquae,1.0,1.0,0.5,1.0
+gordonia_terrae,1.0,1.0,1.0,1.0
+helicobacter_pylori,1.0,1.0,0.5277777777777778,1.0
+klebsiella_oxytoca,1.0,1.0,0.3333333333333333,1.0
+klebsiella_pneumoniae,1.0,1.0,0.9444444444444444,1.0
+lactobacillus_casei,1.0,1.0,0.4166666666666667,1.0
+lactobacillus_delbrueckii,1.0,1.0,0.7777777777777778,1.0
+lactobacillus_fermentum,1.0,1.0,0.16666666666666666,1.0
+lactobacillus_gasseri,1.0,1.0,0.25,1.0
+lactobacillus_johnsonii,1.0,1.0,0.5833333333333334,1.0
+lactobacillus_paracasei,1.0,1.0,0.5555555555555556,1.0
+lactobacillus_plantarum,1.0,1.0,0.4444444444444444,1.0
+lactococcus_garvieae,1.0,1.0,0.3333333333333333,1.0
+lactococcus_lactis,1.0,1.0,0.9722222222222222,1.0
+leuconostoc_mesenteroides,1.0,1.0,0.7777777777777778,1.0
+leuconostoc_pseudomesenteroides,0.0,0.0,0.3333333333333333,1.0
+listeria_monocytogenes,1.0,1.0,0.6111111111111112,1.0
+mannheimia_haemolytica,1.0,1.0,0.5,1.0
+microbacterium_foliorum,1.0,1.0,0.5833333333333334,1.0
+mycobacterium_smegmatis,1.0,1.0,1.0,1.0
+mycobacterium_tuberculosis,1.0,1.0,0.4444444444444444,1.0
+paenibacillus_larvae,1.0,1.0,0.8333333333333334,1.0
+pantoea_agglomerans,1.0,1.0,0.3888888888888889,1.0
+pectobacterium_atrosepticum,1.0,1.0,0.6388888888888888,1.0
+pectobacterium_carotovorum,1.0,1.0,0.5833333333333334,1.0
+prochlorococcus_marinus,1.0,1.0,0.4444444444444444,1.0
+propionibacterium_acnes,1.0,1.0,1.0,1.0
+propionibacterium_freudenreichii,1.0,1.0,0.6111111111111112,1.0
+proteus_mirabilis,1.0,1.0,0.7777777777777778,1.0
+pseudoalteromonas_marina,1.0,1.0,0.3888888888888889,1.0
+pseudomonas_aeruginosa,1.0,1.0,1.0,1.0
+pseudomonas_fluorescens,1.0,1.0,0.5277777777777778,1.0
+pseudomonas_putida,1.0,1.0,0.5,1.0
+pseudomonas_syringae,1.0,1.0,0.9166666666666666,1.0
+ralstonia_solanacearum,1.0,1.0,0.8611111111111112,1.0
+rhizobium_etli,1.0,1.0,0.5555555555555556,1.0
+rhizobium_leguminosarum,1.0,1.0,0.3611111111111111,1.0
+rhodobacter_capsulatus,1.0,1.0,0.6944444444444444,1.0
+rhodococcus_equi,1.0,1.0,0.8333333333333334,1.0
+rhodococcus_erythropolis,1.0,1.0,0.4722222222222222,1.0
+salinibacter_ruber,1.0,1.0,0.4444444444444444,1.0
+salmonella_enterica,1.0,1.0,0.9444444444444444,1.0
+salmonella_enteritidis,1.0,1.0,0.5,1.0
+salmonella_paratyphi,1.0,1.0,0.3055555555555556,1.0
+salmonella_typhimurium,1.0,1.0,0.8055555555555556,1.0
+shewanella sp.,0.25,0.5,0.2708333333333333,0.75
+shewanella sp. 10n.6,0.3333333333333333,0.6666666666666666,0.018518518518518517,1.0
+shewanella sp. m16,1.0,1.0,0.3611111111111111,1.0
+shigella_boydii,1.0,1.0,0.3611111111111111,1.0
+shigella_flexneri,1.0,1.0,0.7222222222222222,1.0
+shigella_sonnei,1.0,1.0,0.6944444444444444,1.0
+sinorhizobium_meliloti,1.0,1.0,0.4444444444444444,1.0
+staphylococcus_aureus,1.0,1.0,0.9166666666666666,1.0
+staphylococcus_auricularis,1.0,1.0,0.1388888888888889,1.0
+staphylococcus_capitis,1.0,1.0,0.7777777777777778,1.0
+staphylococcus_chromogenes,1.0,1.0,0.6388888888888888,1.0
+staphylococcus_cohnii,1.0,1.0,0.5277777777777778,1.0
+staphylococcus_epidermidis,1.0,1.0,0.8333333333333334,1.0
+staphylococcus_equorum,1.0,1.0,0.8611111111111112,1.0
+staphylococcus_fleuretti,0.0,0.0,0.3611111111111111,1.0
+staphylococcus_haemolyticus,0.0,0.0,0.2777777777777778,1.0
+staphylococcus_hyicus,1.0,1.0,0.2777777777777778,1.0
+staphylococcus_kloosii,1.0,1.0,0.6388888888888888,1.0
+staphylococcus_lentus,1.0,1.0,0.4166666666666667,1.0
+staphylococcus_lugdunensis,1.0,1.0,0.8055555555555556,1.0
+staphylococcus_pasteuri,0.0,1.0,0.19444444444444445,1.0
+staphylococcus_pettenkoferi,1.0,1.0,0.1388888888888889,1.0
+staphylococcus_saprophyticus,1.0,1.0,0.16666666666666666,1.0
+staphylococcus_schleiferi,1.0,1.0,0.8888888888888888,1.0
+staphylococcus_sciuri,1.0,1.0,0.8333333333333334,1.0
+staphylococcus_succinus,1.0,1.0,0.6388888888888888,1.0
+staphylococcus_vitulinus,1.0,1.0,0.9166666666666666,1.0
+staphylococcus_warneri,0.0,1.0,0.19444444444444445,1.0
+staphylococcus_xylosus,1.0,1.0,0.7777777777777778,1.0
+streptococcus_pyogenes,1.0,1.0,0.6111111111111112,1.0
+streptococcus_thermophilus,1.0,1.0,0.6944444444444444,1.0
+streptomyces_avermitilis,1.0,1.0,0.3611111111111111,1.0
+streptomyces_coelicolor,1.0,1.0,0.4722222222222222,1.0
+streptomyces_griseus,1.0,1.0,0.6388888888888888,1.0
+streptomyces_lividans,1.0,1.0,0.75,1.0
+streptomyces_venezuelae,1.0,1.0,0.4444444444444444,1.0
+thermus_thermophilus,1.0,1.0,0.3888888888888889,1.0
+vibrio alginolyticus,1.0,1.0,0.4166666666666667,1.0
+vibrio alginolyticus nbrc 15630 = atcc 17749,1.0,1.0,0.3611111111111111,1.0
+vibrio anguillarum,1.0,1.0,0.2222222222222222,1.0
+vibrio breoganii,0.16666666666666666,0.16666666666666666,0.125,0.5
+vibrio campbellii,1.0,1.0,0.3333333333333333,1.0
+vibrio campbellii atcc baa-1116,1.0,1.0,0.3888888888888889,1.0
+vibrio campbellii hy01,1.0,1.0,0.16666666666666666,1.0
+vibrio cholerae,1.0,1.0,0.9722222222222222,1.0
+vibrio cholerae o1,1.0,1.0,0.3333333333333333,1.0
+vibrio cholerae o1 biovar el tor,1.0,1.0,0.5555555555555556,1.0
+vibrio cholerae o139,1.0,1.0,0.5555555555555556,1.0
+vibrio coralliilyticus,1.0,1.0,0.4444444444444444,1.0
+vibrio coralliilyticus p1,1.0,1.0,0.16666666666666666,1.0
+vibrio crassostreae,1.0,1.0,1.0,1.0
+vibrio cyclitrophicus,0.2,0.2,0.1944444444444445,0.6
+vibrio cyclitrophicus 1f273,1.0,1.0,0.2222222222222222,1.0
+vibrio cyclitrophicus 1f53,1.0,1.0,0.3055555555555556,1.0
+vibrio harveyi,1.0,1.0,0.8888888888888888,1.0
+vibrio kanaloae,0.0,0.0,0.0,1.0
+vibrio lentus,0.1,0.1,0.09444444444444447,0.3
+vibrio mediterranei,1.0,1.0,0.2777777777777778,1.0
+vibrio natriegens,1.0,1.0,0.4722222222222222,1.0
+vibrio neocaledonicus,1.0,1.0,0.2222222222222222,1.0
+vibrio parahaemolyticus,1.0,1.0,0.7777777777777778,1.0
+vibrio parahaemolyticus rimd 2210633,1.0,1.0,0.16666666666666666,1.0
+vibrio sp.,0.043478260869565216,0.043478260869565216,0.06521739130434784,0.13043478260869565
+vibrio sp. 10n.1,1.0,1.0,0.05555555555555555,1.0
+vibrio sp. 10n.2,1.0,1.0,0.027777777777777776,1.0
+vibrio sp. f12,0.2,0.2,0.044444444444444446,0.6
+vibrio sp. f13,0.3333333333333333,0.3333333333333333,0.05555555555555555,1.0
+vibrio splendidus,0.125,0.125,0.10416666666666667,0.375
+vibrio tasmaniensis,1.0,1.0,0.1111111111111111,1.0
+vibrio vulnificus,1.0,1.0,0.05555555555555555,1.0
+vibrio_alginolyticus,1.0,1.0,0.5,1.0
+vibrio_cholerae,1.0,1.0,0.9444444444444444,1.0
+vibrio_harveyi,1.0,1.0,0.3055555555555556,1.0
+vibrio_parahaemolyticus,1.0,1.0,0.75,1.0
+vibrio_splendidus,1.0,1.0,0.25,1.0
+vibrio_vulnificus,1.0,1.0,0.5,1.0
+xanthomonas_campestris,1.0,1.0,0.25,1.0
+xanthomonas_oryzae,1.0,1.0,0.3333333333333333,1.0
+xylella_fastidiosa,1.0,1.0,0.4444444444444444,1.0
+yersinia_enterocolitica,1.0,1.0,0.5555555555555556,1.0
+yersinia_pestis,1.0,1.0,0.6666666666666666,1.0

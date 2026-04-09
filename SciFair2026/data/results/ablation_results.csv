@@ -1,0 +1,8 @@
+condition,mean_auc
+Full model (all features),0.989
+No genomic (no di/tri/tet/cub),0.989
+No pair features (no tetra_corr/cub_dist),0.9829
+Baseline (k3dist/k6dist/GCdiff/Homology only),0.9075
+GNN full model,0.9966
+GNN no name embeddings,0.9964
+GNN no genomic features,0.9896
