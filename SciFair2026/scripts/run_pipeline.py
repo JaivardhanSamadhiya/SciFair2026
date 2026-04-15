@@ -29,7 +29,7 @@ EDIT THESE TWO PATHS, then just run:
 # ▶▶  EDIT THESE TWO LINES  ◀◀
 # ════════════════════════════════════════════════════════════════
 VHI_CSV    = r"D:\SciFair2026\SciFair2026\data\raw\VirusHostInter.csv"
-PHAGE_FASTA= r"D:\SciFair2026\SciFair2026\data\fastas\phage_genomes.fasta"
+PHAGE_FASTA= r"D:\SciFair2026\SciFair2026\data\raw\ncbi_phage_seqs.fasta"
 # ════════════════════════════════════════════════════════════════
 
 from pathlib import Path
