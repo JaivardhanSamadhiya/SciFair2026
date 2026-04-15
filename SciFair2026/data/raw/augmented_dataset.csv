@@ -10380,6 +10380,8 @@ Unnamed: 0,host,phage,label,k3dist,k6dist,GCdiff,Homology,pairs,data,host_strain
 ,vibrio harveyi,2900301,1,0.0,0.0,0.0,0.0,,,vibrio harveyi,vibrio,external
 ,vibrio harveyi,3032411,1,0.0,0.0,0.0,0.0,,,vibrio harveyi,vibrio,external
 ,vibrio parahaemolyticus,127509,1,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,external
+,vibrio sp.,PZ099672.1,1,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus atcc 17802,vibrio,external
+,shewanella sp.,PZ099626.1,1,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,external
 ,vibrio sp.,PX979742.1,1,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,external
 ,vibrio sp.,PX979741.1,1,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,external
 ,vibrio sp.,PZ038745.1,1,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,vibrio,external
@@ -10428,10 +10430,6 @@ Unnamed: 0,host,phage,label,k3dist,k6dist,GCdiff,Homology,pairs,data,host_strain
 ,vibrio sp.,PV871617.1,1,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,external
 ,vibrio sp.,PV244425.1,1,0.0,0.0,0.0,0.0,,,vibrio vulnificus vva6,vibrio,external
 ,vibrio sp.,PV244424.1,1,0.0,0.0,0.0,0.0,,,vibrio vulnificus vva6,vibrio,external
-,vibrio sp.,PV834959.1,1,0.0,0.0,0.0,0.0,,,vibrio cholerae wtb02,vibrio,external
-,vibrio sp.,PV648004.1,1,0.0,0.0,0.0,0.0,,,vibrio cholerae,vibrio,external
-,vibrio sp.,PV785814.1,1,0.0,0.0,0.0,0.0,,,vibrio sp.,vibrio,external
-,vibrio sp.,PV740454.1,1,0.0,0.0,0.0,0.0,,,vibrio sp.,vibrio,external
 ,vibrio lentus,1003177,0,0.0,0.0,0.0,0.0,,,vibrio lentus,vibrio,negative
 ,pectobacterium_atrosepticum,1003177,0,0.0,0.0,0.0,0.0,,,pectobacterium_atrosepticum,pectobacterium_atrosepticum,negative
 ,vibrio_natriegens,1003177,0,0.0,0.0,0.0,0.0,,,vibrio_natriegens,vibrio_natriegens,negative
@@ -20891,99 +20889,93 @@ Unnamed: 0,host,phage,label,k3dist,k6dist,GCdiff,Homology,pairs,data,host_strain
 ,vibrio variabilis,PV244425.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus vva6,vibrio,negative
 ,gordonia_sputi,PV244425.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus vva6,gordonia_sputi,negative
 ,bdellovibrio_bacteriovorus,PV244425.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus vva6,bdellovibrio_bacteriovorus,negative
-,vibrio cholerae o139,PV648004.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,vibrio,negative
-,vibrio_alginolyticus,PV648004.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,vibrio_alginolyticus,negative
-,streptomyces_scabiei,PV648004.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,streptomyces_scabiei,negative
-,vibrio campbellii,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,vibrio,negative
-,staphylococcus_pasteuri,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,staphylococcus_pasteuri,negative
-,rhodococcus_opacus,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,rhodococcus_opacus,negative
-,vibrio kanaloae,PV740454.1,0,0.0,0.0,0.0,0.0,,,vibrio kanaloae,vibrio,negative
-,paenibacillus_fonticola,PV740454.1,0,0.0,0.0,0.0,0.0,,,paenibacillus_fonticola,paenibacillus_fonticola,negative
-,staphylococcus_intermedius,PV740454.1,0,0.0,0.0,0.0,0.0,,,staphylococcus_intermedius,staphylococcus_intermedius,negative
-,vibrio parahaemolyticus nbrc 12711,PV785814.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus nbrc 12711,vibrio,negative
-,vibrio_metschnikovii,PV785814.1,0,0.0,0.0,0.0,0.0,,,vibrio_metschnikovii,vibrio_metschnikovii,negative
-,rhodopseudomonas_palustris,PV785814.1,0,0.0,0.0,0.0,0.0,,,rhodopseudomonas_palustris,rhodopseudomonas_palustris,negative
-,shewanella indica,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,shewanella,negative
-,pseudoalteromonas_arctica,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,pseudoalteromonas_arctica,negative
-,mycobacterium_tuberculosis,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,mycobacterium_tuberculosis,negative
-,vibrio maritimus,PV834959.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae wtb02,vibrio,negative
-,yersinia_enterocolitica,PV834959.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae wtb02,yersinia_enterocolitica,negative
-,clostridium_sporogenes,PV834959.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae wtb02,clostridium_sporogenes,negative
-,vibrio splendidus,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,shewanella sp. 10n.7,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,shewanella,negative
-,burkholderia_cepacia,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,burkholderia_cepacia,negative
-,vibrio breoganii,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,paenibacillus_peoriae,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,paenibacillus_peoriae,negative
-,shewanella sp. 40,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,shewanella,negative
-,vibrio ordalii,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
-,staphylococcus_hyicus,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,staphylococcus_hyicus,negative
-,burkholderia_pseudomallei,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,burkholderia_pseudomallei,negative
-,vibrio sp. yd38,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,vibrio,negative
-,erythrobacter_longus,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,erythrobacter_longus,negative
-,paenibacillus_elgii,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,paenibacillus_elgii,negative
-,vibrio maritimus,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
-,microcystis_aeruginosa,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,microcystis_aeruginosa,negative
-,pseudomonas_taetrolens,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,pseudomonas_taetrolens,negative
-,vibrio pelagius,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,staphylococcus_capitis,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,staphylococcus_capitis,negative
-,vibrio_alginolyticus,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio_alginolyticus,negative
-,vibrio harveyi,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,clostridium_tetani,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,clostridium_tetani,negative
-,yersinia_pestis,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,yersinia_pestis,negative
-,vibrio tasmaniensis,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,vibrio,negative
-,vibrio_fischeri,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,vibrio_fischeri,negative
-,bacillus_weihenstephanensis,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,bacillus_weihenstephanensis,negative
-,vibrio sp. yd21,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,vibrio,negative
-,staphylococcus_pasteuri,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,staphylococcus_pasteuri,negative
-,staphylococcus_haemolyticus,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,staphylococcus_haemolyticus,negative
-,vibrio sp. f13,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,vibrio,negative
-,salinivibrio_costicola,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,salinivibrio_costicola,negative
-,salmonella_typhi,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,salmonella_typhi,negative
-,vibrio cyclitrophicus 1f273,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,vibrio,negative
-,pseudomonas_syringae,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,pseudomonas_syringae,negative
-,yersinia_aldovae,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,yersinia_aldovae,negative
-,vibrio coralliilyticus p1,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,vibrio,negative
-,cronobacter_dublinensis,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,cronobacter_dublinensis,negative
-,acinetobacter_johnsonii,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,acinetobacter_johnsonii,negative
-,vibrio coralliilyticus p1,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,vibrio_parahaemolyticus,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio_parahaemolyticus,negative
-,mycobacterium_abscessus,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,mycobacterium_abscessus,negative
-,vibrio parahaemolyticus nbrc 12711,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,vibrio,negative
-,leptolyngbya_foveolarum,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,leptolyngbya_foveolarum,negative
-,vibrio_metschnikovii,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,vibrio_metschnikovii,negative
-,vibrio harveyi,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,vibrio,negative
-,enterobacter_aerogenes,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,enterobacter_aerogenes,negative
-,streptococcus_mitis,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,streptococcus_mitis,negative
-,vibrio harveyi,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,vibrio,negative
-,bacillus_pumilus,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,bacillus_pumilus,negative
-,ruegeria_pomeroyi,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,ruegeria_pomeroyi,negative
-,vibrio chagasii,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,bacillus_thuringiensis,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,bacillus_thuringiensis,negative
-,yersinia_aldovae,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,yersinia_aldovae,negative
-,vibrio campbellii hy01,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,vibrio,negative
-,pseudomonas_agarici,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,pseudomonas_agarici,negative
-,escherichia_coli,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,escherichia_coli,negative
-,vibrio coralliilyticus,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
-,vibrio_mimicus,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio_mimicus,negative
-,enterococcus_faecium,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,enterococcus_faecium,negative
-,shewanella sp. 10n.6,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
-,erwinia_persicina,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,erwinia_persicina,negative
-,gluconobacter_oxydans,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,gluconobacter_oxydans,negative
-,shewanella sp. 10n.6,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
-,gluconobacter_oxydans,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,gluconobacter_oxydans,negative
-,brucella_ceti,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,brucella_ceti,negative
-,shewanella sp. 40,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
-,paenibacillus_elgii,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,paenibacillus_elgii,negative
-,microbacterium_foliorum,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,microbacterium_foliorum,negative
-,vibrio sp. 12g05,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
-,pasteurella_multocida,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,pasteurella_multocida,negative
-,rhodobacter_sphaeroides,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,rhodobacter_sphaeroides,negative
-,vibrio sagamiensis,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
-,porphyromonas_gingivalis,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,porphyromonas_gingivalis,negative
-,staphylococcus_aureus,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,staphylococcus_aureus,negative
-,vibrio chagasii,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,vibrio,negative
-,staphylococcus_aureus,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,staphylococcus_aureus,negative
-,salinibacter_ruber,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,salinibacter_ruber,negative
-,vibrio coralliilyticus p1,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,vibrio,negative
-,rhizobium_radiobacter,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,rhizobium_radiobacter,negative
-,yersinia_intermedia,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,yersinia_intermedia,negative
+,vibrio cholerae o139,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,vibrio,negative
+,vibrio_alginolyticus,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,vibrio_alginolyticus,negative
+,streptomyces_scabiei,PV649651.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kt1024,streptomyces_scabiei,negative
+,shewanella putrefaciens,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,shewanella,negative
+,staphylococcus_pseudintermedius,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,staphylococcus_pseudintermedius,negative
+,bacillus_sphaericus,PV800133.1,0,0.0,0.0,0.0,0.0,,,shewanella sp. y2,bacillus_sphaericus,negative
+,vibrio kanaloae,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,paenibacillus_fonticola,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,paenibacillus_fonticola,negative
+,staphylococcus_intermedius,PV847829.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,staphylococcus_intermedius,negative
+,vibrio parahaemolyticus nbrc 12711,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,vibrio_metschnikovii,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio_metschnikovii,negative
+,rhodopseudomonas_palustris,PV847830.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,rhodopseudomonas_palustris,negative
+,vibrio cholerae,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
+,bacillus_licheniformis,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,bacillus_licheniformis,negative
+,porphyromonas_gingivalis,PV871617.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,porphyromonas_gingivalis,negative
+,vibrio maritimus,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,vibrio,negative
+,yersinia_enterocolitica,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,yersinia_enterocolitica,negative
+,clostridium_sporogenes,PV883422.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp270,clostridium_sporogenes,negative
+,vibrio splendidus,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
+,shewanella sp. 10n.7,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,shewanella,negative
+,burkholderia_cepacia,PX088833.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,burkholderia_cepacia,negative
+,vibrio breoganii,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,paenibacillus_peoriae,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,paenibacillus_peoriae,negative
+,shewanella sp. 40,PX096587.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,shewanella,negative
+,vibrio ordalii,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,staphylococcus_hyicus,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,staphylococcus_hyicus,negative
+,burkholderia_pseudomallei,PX096588.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,burkholderia_pseudomallei,negative
+,vibrio sp. yd38,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,vibrio,negative
+,erythrobacter_longus,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,erythrobacter_longus,negative
+,paenibacillus_elgii,PX393085.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus vp-hl-202005,paenibacillus_elgii,negative
+,vibrio maritimus,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,vibrio,negative
+,microcystis_aeruginosa,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,microcystis_aeruginosa,negative
+,pseudomonas_taetrolens,PX512290.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus nbrc 15630 = atcc 17749,pseudomonas_taetrolens,negative
+,vibrio pelagius,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,vibrio,negative
+,staphylococcus_capitis,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,staphylococcus_capitis,negative
+,vibrio_alginolyticus,PX516383.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae o1 c6706,vibrio_alginolyticus,negative
+,vibrio harveyi,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,vibrio,negative
+,clostridium_tetani,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,clostridium_tetani,negative
+,yersinia_pestis,PX516877.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus hova25,yersinia_pestis,negative
+,vibrio tasmaniensis,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,vibrio,negative
+,vibrio_fischeri,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,vibrio_fischeri,negative
+,bacillus_weihenstephanensis,PX574985.1,0,0.0,0.0,0.0,0.0,,,vibrio sp.,bacillus_weihenstephanensis,negative
+,vibrio sp. yd21,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,staphylococcus_pasteuri,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,staphylococcus_pasteuri,negative
+,staphylococcus_haemolyticus,PX583164.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,staphylococcus_haemolyticus,negative
+,vibrio sp. f13,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,vibrio,negative
+,salinivibrio_costicola,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,salinivibrio_costicola,negative
+,salmonella_typhi,PX585279.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus zs10,salmonella_typhi,negative
+,vibrio cyclitrophicus 1f273,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,vibrio,negative
+,pseudomonas_syringae,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,pseudomonas_syringae,negative
+,yersinia_aldovae,PX670348.1,0,0.0,0.0,0.0,0.0,,,vibrio metschnikovii vm4f,yersinia_aldovae,negative
+,vibrio coralliilyticus p1,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,vibrio,negative
+,cronobacter_dublinensis,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,cronobacter_dublinensis,negative
+,acinetobacter_johnsonii,PX733342.1,0,0.0,0.0,0.0,0.0,,,vibrio vulnificus,acinetobacter_johnsonii,negative
+,vibrio coralliilyticus p1,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,vibrio_parahaemolyticus,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio_parahaemolyticus,negative
+,mycobacterium_abscessus,PX769428.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,mycobacterium_abscessus,negative
+,vibrio parahaemolyticus nbrc 12711,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,vibrio,negative
+,leptolyngbya_foveolarum,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,leptolyngbya_foveolarum,negative
+,vibrio_metschnikovii,PX789363.1,0,0.0,0.0,0.0,0.0,,,vibrio harveyi,vibrio_metschnikovii,negative
+,vibrio harveyi,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,vibrio,negative
+,enterobacter_aerogenes,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,enterobacter_aerogenes,negative
+,streptococcus_mitis,PX852277.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus,streptococcus_mitis,negative
+,shewanella fidelis,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
+,streptococcus_zooepidemicus,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,streptococcus_zooepidemicus,negative
+,burkholderia_pyrrocinia,PX866598.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,burkholderia_pyrrocinia,negative
+,shewanella sp. 41,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
+,streptococcus_zooepidemicus,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,streptococcus_zooepidemicus,negative
+,delftia_acidovorans,PX866607.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,delftia_acidovorans,negative
+,shewanella sp. m16,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
+,klebsiella_pneumoniae,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,klebsiella_pneumoniae,negative
+,chlamydia_psittaci,PX866609.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,chlamydia_psittaci,negative
+,vibrio coralliilyticus,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
+,vibrio_mimicus,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio_mimicus,negative
+,enterococcus_faecium,PX979741.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,enterococcus_faecium,negative
+,vibrio alginolyticus,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,vibrio,negative
+,pseudomonas_tolaasii,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,pseudomonas_tolaasii,negative
+,yersinia_bercovieri,PX979742.1,0,0.0,0.0,0.0,0.0,,,vibrio alginolyticus,yersinia_bercovieri,negative
+,vibrio breoganii,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,vibrio,negative
+,yersinia_bercovieri,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,yersinia_bercovieri,negative
+,saccharibacter_floricola,PX991751.1,0,0.0,0.0,0.0,0.0,,,vibrio cholerae,saccharibacter_floricola,negative
+,vibrio sp. st2,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,vibrio,negative
+,shigella_sonnei,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,shigella_sonnei,negative
+,erysipelothrix_rhusiopathiae,PZ038745.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus kccm11965,erysipelothrix_rhusiopathiae,negative
+,shewanella inventionis,PZ099626.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,shewanella,negative
+,vibrio sp.,PZ099626.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,vibrio,negative
+,pseudomonas_fluorescens,PZ099626.1,0,0.0,0.0,0.0,0.0,,,shewanella oneidensis mr-1,pseudomonas_fluorescens,negative
+,vibrio sagamiensis,PZ099672.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus atcc 17802,vibrio,negative
+,porphyromonas_gingivalis,PZ099672.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus atcc 17802,porphyromonas_gingivalis,negative
+,staphylococcus_aureus,PZ099672.1,0,0.0,0.0,0.0,0.0,,,vibrio parahaemolyticus atcc 17802,staphylococcus_aureus,negative

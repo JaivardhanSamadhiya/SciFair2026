@@ -65,7 +65,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
-from scipy.stats import wilcoxon, mannwhitneyu
+from scipy.stats import wilcoxon
 from scipy.sparse.linalg import svds
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import (roc_auc_score, f1_score, matthews_corrcoef,
@@ -75,26 +75,24 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import (RandomForestClassifier, GradientBoostingClassifier,
                                ExtraTreesClassifier, HistGradientBoostingClassifier)
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import StratifiedKFold
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 
-warnings.filterwarnings("ignore")
+for _wcat in (FutureWarning, DeprecationWarning, UserWarning):
+    warnings.filterwarnings("ignore", category=_wcat)
 sns.set_theme(style="whitegrid", palette="colorblind")
 
-# PyTorch probe
-_probe = _sp.run([sys.executable, "-c",
-    "import torch; import torch_geometric; print(torch.__version__)"],
-    capture_output=True, text=True, timeout=120)
-HAS_TORCH = _probe.returncode == 0 and bool(_probe.stdout.strip())
-if HAS_TORCH:
+# PyTorch import (direct try/except avoids subprocess overhead)
+HAS_TORCH = False
+try:
     import torch, torch.nn as nn, torch.nn.functional as F
     from torch_geometric.nn import SAGEConv, GATConv
     from torch_geometric.utils import to_undirected
     from torch.cuda.amp import autocast, GradScaler
+    HAS_TORCH = True
     print(f"  PyTorch {torch.__version__} + PyG ✓")
-else:
-    print(f"  PyTorch unavailable — GNN will use NumPy fallback\n  ({_probe.stderr.strip()[:120]})")
+except ImportError as _e:
+    print(f"  PyTorch unavailable — GNN will use NumPy fallback\n  ({str(_e)[:120]})")
 
 try:
     import xgboost as xgb; HAS_XGB = True; print("  XGBoost ✓")
@@ -955,9 +953,15 @@ if _missing_accs:
     else:
         print(f"  NCBI: no new sequences found (all already cached or network unavailable)")
 
-# PCA-reduce tet (256→32) and cub (64→18)
-tet_arr = np.vstack(tet_vecs)
-cub_arr = np.vstack(cub_vecs)
+# Keep raw tet/cub vectors for pair-level features (same coordinate space for phage & host)
+tet_arr_raw = np.vstack(tet_vecs)   # (n_phages, 256) — full tetranucleotide frequencies
+cub_arr_raw = np.vstack(cub_vecs)   # (n_phages, 64)  — full RSCU vectors
+_phage_tet_raw = {pn: tet_arr_raw[i] for i, pn in enumerate(phage_names)}
+_phage_cub_raw = {pn: cub_arr_raw[i] for i, pn in enumerate(phage_names)}
+
+# PCA-reduce tet (256→32) and cub (64→18) for node-level features only
+tet_arr = tet_arr_raw.copy()
+cub_arr = cub_arr_raw.copy()
 n_tet = min(32, tet_arr.shape[0]-1, tet_arr.shape[1]-1)
 n_cub = min(18, cub_arr.shape[0]-1, cub_arr.shape[1]-1)
 if n_tet > 1 and np.any(tet_arr!=0):
@@ -991,47 +995,54 @@ if host_seqs:
         if t is not None:
             host_tet[hname] = t; host_cub[hname] = c; host_gc[hname] = g
 
-print("  Building pair-level features (vectorised)...")
+# FIX-A: Compute pair-level features in the SAME raw coordinate space (full 256-dim tet,
+# full 64-dim RSCU) for both phage and host, NOT in PCA-reduced phage space.
+print("  Building pair-level features (vectorised, matched coordinate spaces)...")
 _n = len(dataset)
 _ph = dataset["phage"].values
 _ho = dataset["host"].values
 p_tet_cols = [f"p_tet_{j:02d}" for j in range(n_tet)]
 p_cub_cols = [f"p_cub_{j:02d}" for j in range(n_cub)]
-_p_tet_mat = np.zeros((_n, n_tet), dtype=np.float32)
-if p_tet_cols and all(c in phage_feat_df.columns for c in p_tet_cols):
-    _p_tet_mat = np.nan_to_num(
-        phage_feat_df.reindex(_ph)[p_tet_cols].values.astype(np.float32), nan=0.0)
-_h_tet_mat = np.zeros((_n, n_tet), dtype=np.float32)
+
+_RAW_TET_DIM = 256
+_RAW_CUB_DIM = 64
+_p_tet_raw_mat = np.zeros((_n, _RAW_TET_DIM), dtype=np.float32)
+for i, pn in enumerate(_ph):
+    if pn in _phage_tet_raw:
+        _p_tet_raw_mat[i] = _phage_tet_raw[pn]
+_h_tet_raw_mat = np.zeros((_n, _RAW_TET_DIM), dtype=np.float32)
 for _hname, _vec in host_tet.items():
     _m = _ho == _hname
     if _m.any():
-        _h_tet_mat[_m] = _vec[:n_tet]
-_ph_ok = dataset["phage"].isin(phage_feat_df.index).values
+        _h_tet_raw_mat[_m] = _vec
+
+_ph_ok = np.isin(_ph, list(_phage_tet_raw.keys()))
 _ho_t_ok = np.isin(_ho, list(host_tet.keys()))
-_tet_mask = _ph_ok & _ho_t_ok & (n_tet > 1)
+_tet_mask = _ph_ok & _ho_t_ok
 _tet_corr = np.zeros(_n, dtype=np.float32)
 if _tet_mask.any():
-    _a = _p_tet_mat[_tet_mask].astype(np.float64)
-    _b = _h_tet_mat[_tet_mask].astype(np.float64)
+    _a = _p_tet_raw_mat[_tet_mask].astype(np.float64)
+    _b = _h_tet_raw_mat[_tet_mask].astype(np.float64)
     _am = _a - _a.mean(axis=1, keepdims=True)
     _bm = _b - _b.mean(axis=1, keepdims=True)
     _num = (_am * _bm).sum(axis=1)
     _den = np.sqrt(np.maximum((_am * _am).sum(axis=1) * (_bm * _bm).sum(axis=1), 1e-20))
     _tet_corr[_tet_mask] = np.nan_to_num(_num / _den, nan=0.0).astype(np.float32)
 
-_p_cub_mat = np.zeros((_n, n_cub), dtype=np.float32)
-if p_cub_cols and all(c in phage_feat_df.columns for c in p_cub_cols):
-    _p_cub_mat = np.nan_to_num(
-        phage_feat_df.reindex(_ph)[p_cub_cols].values.astype(np.float32), nan=0.0)
-_h_cub_mat = np.zeros((_n, n_cub), dtype=np.float32)
+_p_cub_raw_mat = np.zeros((_n, _RAW_CUB_DIM), dtype=np.float32)
+for i, pn in enumerate(_ph):
+    if pn in _phage_cub_raw:
+        _p_cub_raw_mat[i] = _phage_cub_raw[pn]
+_h_cub_raw_mat = np.zeros((_n, _RAW_CUB_DIM), dtype=np.float32)
 for _hname, _vec in host_cub.items():
     _m = _ho == _hname
     if _m.any():
-        _h_cub_mat[_m] = _vec[:n_cub]
-_cub_mask = dataset["phage"].isin(phage_feat_df.index).values & np.isin(_ho, list(host_cub.keys()))
+        _h_cub_raw_mat[_m] = _vec
+_cub_mask = np.isin(_ph, list(_phage_cub_raw.keys())) & np.isin(_ho, list(host_cub.keys()))
 _cub_dist = np.zeros(_n, dtype=np.float32)
 if _cub_mask.any():
-    _cub_dist[_cub_mask] = np.linalg.norm(_p_cub_mat[_cub_mask] - _h_cub_mat[_cub_mask], axis=1)
+    _cub_dist[_cub_mask] = np.linalg.norm(
+        _p_cub_raw_mat[_cub_mask] - _h_cub_raw_mat[_cub_mask], axis=1)
 
 _p_gc = phage_feat_df.reindex(_ph)["p_gc"].fillna(0.5).values.astype(np.float32)
 _h_gc = np.array([host_gc.get(h, 0.5) for h in _ho], dtype=np.float32)
@@ -1079,7 +1090,7 @@ n_hosts    = len(host_list)
 dataset["phage_idx"] = dataset["phage"].map(phage2idx)
 dataset["host_idx"]  = dataset["host"].map(host2idx)
 
-# FIX: Verify EDGE_FEATS_NP will align with dataset rows
+# Verify dataset index is clean after reset
 assert len(dataset) == len(dataset.index), "Dataset index not clean after reset"
 
 _vec = CountVectorizer(analyzer="char",ngram_range=(3,5),max_features=_CHAR_NGRAM_MAX,dtype=np.float32)
@@ -1166,12 +1177,12 @@ HOST_DIM   = HOST_BASE.shape[1]+2
 _rich = [c for c in ["tetra_corr","cub_dist","gc_match","len_ratio"] if c in dataset.columns]
 ALL_EDGE_FEATS = NUMERIC_FEATS + _rich
 N_EDGE_FEATS   = len(ALL_EDGE_FEATS)
-EDGE_FEATS_NP  = StandardScaler().fit_transform(
-    dataset[ALL_EDGE_FEATS].fillna(0.0).values.astype(np.float32))
 
-# FIX: Verify alignment
-assert len(EDGE_FEATS_NP) == len(dataset), \
-    f"EDGE_FEATS_NP row count {len(EDGE_FEATS_NP)} != dataset {len(dataset)}"
+# FIX-B: Store RAW (unscaled) edge features; scaling happens per-fold inside run_fold
+# to prevent information leakage from test fold statistics into the scaler.
+EDGE_FEATS_RAW = dataset[ALL_EDGE_FEATS].fillna(0.0).values.astype(np.float32)
+assert len(EDGE_FEATS_RAW) == len(dataset), \
+    f"EDGE_FEATS_RAW row count {len(EDGE_FEATS_RAW)} != dataset {len(dataset)}"
 
 print(f"  Phage node dim: {PHAGE_DIM_FIXED}  Host node dim: {HOST_DIM}")
 print(f"  Edge features ({N_EDGE_FEATS}): {ALL_EDGE_FEATS}")
@@ -1193,7 +1204,7 @@ all_feat_cols = NUMERIC_FEATS + _rich + (ph_feat_cols[:32] if len(ph_feat_cols)>
 all_feat_cols = [c for c in all_feat_cols if c in dataset.columns]
 X_all = dataset[all_feat_cols].fillna(0.0).values.astype(np.float32)
 y_all = all_labels.copy()
-X_sc  = StandardScaler().fit_transform(X_all)
+# FIX-B: No global X_sc — scaling happens per fold to prevent information leakage
 
 # FIX: raise min positives/negatives from 2 to 3 for more stable evaluation
 valid_species = sorted([sp for sp in dataset["host"].unique()
@@ -1222,8 +1233,11 @@ else:
         rows=[]; probas=np.full(len(dataset),np.nan)
         for sp in valid_species:
             tm=(dataset["host"]==sp).values
-            Xtr,ytr=X_sc[~tm],y_all[~tm]
-            Xte,yte=X_sc[tm], y_all[tm]
+            # FIX-B: fit scaler on training fold only to prevent leakage
+            _fold_sc = StandardScaler()
+            Xtr = _fold_sc.fit_transform(X_all[~tm])
+            Xte = _fold_sc.transform(X_all[tm])
+            ytr, yte = y_all[~tm], y_all[tm]
             if len(np.unique(yte))<2: continue
             clf = make_model()
             clf.fit(Xtr,ytr)
@@ -1300,6 +1314,23 @@ if HAS_TORCH:
             h = self.bn3(F.gelu(self.gat3(h, ei, edge_attr=ea))); h = self.drop(h)
             return self.gat4(h, ei, edge_attr=ea)
 
+        @torch.no_grad()
+        def get_attention_weights(self, px, hx, ei, ea):
+            """Extract per-layer attention weights for interpretability."""
+            self.eval()
+            h = torch.cat([F.gelu(self.proj_p(px)), F.gelu(self.proj_h(hx))], dim=0)
+            attn_weights = []
+            for layer, bn in [(self.gat1, self.bn1), (self.gat2, self.bn2),
+                               (self.gat3, self.bn3)]:
+                h_out, (ei_out, alpha) = layer(h, ei, edge_attr=ea,
+                                                return_attention_weights=True)
+                attn_weights.append(alpha.cpu())
+                h = bn(F.gelu(h_out))
+            _, (ei_4, alpha_4) = self.gat4(h, ei, edge_attr=ea,
+                                            return_attention_weights=True)
+            attn_weights.append(alpha_4.cpu())
+            return attn_weights, ei_out.cpu()
+
         def decode(self, z, px, hx, pi, hi, ef):
             gnn_score = self.mlp_gnn(torch.cat([z[pi], z[hi + self._n_ph], ef], dim=-1))
             bypass_score = self.mlp_bypass(torch.cat([px[pi], hx[hi], ef], dim=-1))
@@ -1374,11 +1405,11 @@ else:
         def __init__(self, *a, **k): pass
 
 
-def _build_gat_graph(mask):
+def _build_gat_graph(mask, edge_feats_scaled):
     pm  = (dataset["label"] == 1).values & mask
     src = torch.tensor(dataset.loc[pm, "phage_idx"].values, dtype=torch.long)
     dst = torch.tensor(dataset.loc[pm, "host_idx"].values + n_phages, dtype=torch.long)
-    ef  = torch.tensor(EDGE_FEATS_NP[pm], dtype=torch.float32)
+    ef  = torch.tensor(edge_feats_scaled[pm], dtype=torch.float32)
     ei  = torch.cat([torch.stack([src, dst], dim=0),
                      torch.stack([dst, src], dim=0)], dim=1)
     ea  = torch.cat([ef, ef], dim=0)
@@ -1426,6 +1457,12 @@ def run_fold(train_mask, test_mask, arch="GAT"):
     te_df = dataset[test_mask].reset_index(drop=True)
     yte   = te_df["label"].values
 
+    # FIX-B: per-fold edge feature scaling — fit on training rows only
+    _ef_scaler = StandardScaler()
+    _ef_scaled = np.zeros_like(EDGE_FEATS_RAW)
+    _ef_scaled[train_mask] = _ef_scaler.fit_transform(EDGE_FEATS_RAW[train_mask])
+    _ef_scaled[test_mask]  = _ef_scaler.transform(EDGE_FEATS_RAW[test_mask])
+
     if not HAS_TORCH:
         m = NumpyFallback(); m.fit(px_np, hx_np, tr_df)
         return m.predict_proba(te_df), yte
@@ -1439,7 +1476,7 @@ def run_fold(train_mask, test_mask, arch="GAT"):
     crit = nn.BCEWithLogitsLoss(pos_weight=pw)
 
     if arch == "GAT":
-        ei, ea = _build_gat_graph(train_mask)
+        ei, ea = _build_gat_graph(train_mask, _ef_scaled)
         ei = ei.to(DEVICE); ea = ea.to(DEVICE)
         model  = PhageHostGAT(px_np.shape[1], hx_np.shape[1], N_EDGE_FEATS, n_phages).to(DEVICE)
     else:
@@ -1449,14 +1486,13 @@ def run_fold(train_mask, test_mask, arch="GAT"):
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WD)
     sch = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
         opt, T_0=(100 if _THOROUGH else 45), eta_min=1e-5)
-    # FIX: do NOT compile inside run_fold — compilation is expensive and not reused per call
 
     tr_global_idx = np.where(train_mask)[0]
     all_pi = torch.tensor(tr_df["phage_idx"].values, dtype=torch.long).to(DEVICE)
     all_hi = torch.tensor(tr_df["host_idx"].values,  dtype=torch.long).to(DEVICE)
     all_lb = torch.tensor(tr_df["label"].values.astype(np.float32), dtype=torch.float32).to(DEVICE)
     if arch == "GAT":
-        all_ef = torch.tensor(EDGE_FEATS_NP[tr_global_idx], dtype=torch.float32).to(DEVICE)
+        all_ef = torch.tensor(_ef_scaled[tr_global_idx], dtype=torch.float32).to(DEVICE)
 
     tr_labels = tr_df["label"].values
     pos_idx = np.where(tr_labels == 1)[0]; neg_idx = np.where(tr_labels == 0)[0]
@@ -1469,7 +1505,7 @@ def run_fold(train_mask, test_mask, arch="GAT"):
     vhi = torch.tensor(val_df["host_idx"].values,  dtype=torch.long).to(DEVICE)
     vlb = val_df["label"].values; has_vc = len(np.unique(vlb)) == 2
     if arch == "GAT":
-        vef = torch.tensor(EDGE_FEATS_NP[tr_global_idx[vidx]], dtype=torch.float32).to(DEVICE)
+        vef = torch.tensor(_ef_scaled[tr_global_idx[vidx]], dtype=torch.float32).to(DEVICE)
 
     n_pairs  = len(all_pi)
     BATCH = 8192 if DEVICE.type == "cuda" else 4096
@@ -1530,17 +1566,16 @@ def run_fold(train_mask, test_mask, arch="GAT"):
 
     full_mask = train_mask | test_mask
     if arch == "GAT":
-        ei_full, ea_full = _build_gat_graph(full_mask)
+        ei_full, ea_full = _build_gat_graph(full_mask, _ef_scaled)
         ei_full = ei_full.to(DEVICE); ea_full = ea_full.to(DEVICE)
     else:
         ei_full = _build_edges(full_mask).to(DEVICE)
 
     tpi = torch.tensor(te_df["phage_idx"].values, dtype=torch.long).to(DEVICE)
     thi = torch.tensor(te_df["host_idx"].values,  dtype=torch.long).to(DEVICE)
-    # FIX: use boolean mask correctly for EDGE_FEATS_NP
     test_global_idx = np.where(test_mask)[0]
     if arch == "GAT":
-        tef   = torch.tensor(EDGE_FEATS_NP[test_global_idx], dtype=torch.float32).to(DEVICE)
+        tef   = torch.tensor(_ef_scaled[test_global_idx], dtype=torch.float32).to(DEVICE)
         proba = model.predict(px, hx, ei_full, ea_full, tpi, thi, tef)
     else:
         proba = model.predict(px, hx, ei_full, tpi, thi)
@@ -1579,14 +1614,13 @@ def run_gnn_pipeline(arch):
     if _loso_cache_path.exists():
         _done_df = pd.read_csv(_loso_cache_path, index_col="species")
         loso_rows = _done_df.reset_index().to_dict("records")
-        print(f"  Resuming: {len(loso_rows)} species already done, skipping.")
     else:
         _done_df = pd.DataFrame()
         loso_rows = []
     _done_species = set(_done_df.index.tolist()) if len(_done_df) else set()
     all_proba = np.full(len(dataset), np.nan)
 
-    # FIX: fast vectorised cache reload using merge instead of iterrows O(n²)
+    # Reload cached predictions (fast vectorised merge)
     if _pred_cache_path.exists() and len(_done_species):
         _pred_cache = pd.read_csv(_pred_cache_path)
         if "proba" in _pred_cache.columns and "host" in _pred_cache.columns:
@@ -1594,8 +1628,15 @@ def run_gnn_pipeline(arch):
                 _pred_cache[["phage","host","proba"]], on=["phage","host"], how="left")
             _merged = _merged.set_index("index").sort_index()
             all_proba = _merged["proba"].values.astype(np.float64)
+            _n_restored = np.isfinite(all_proba).sum()
+            if _n_restored == 0 and len(_done_species) > 0:
+                print(f"  WARNING: predictions cache is stale/empty — will re-run all folds")
+                _done_species = set()
+                loso_rows = []
 
     _remaining = [sp for sp in valid_species if sp not in _done_species]
+    if _done_species:
+        print(f"  Resuming: {len(_done_species)} species cached, {len(_remaining)} remaining")
     print(f"  LOSO ({len(valid_species)} species, {len(_remaining)} remaining)...")
     t0=time.time()
     for sp in _remaining:
@@ -1753,9 +1794,17 @@ else:
     for _arch in ["GAT", "SAGE"]:
         gnn_results[_arch]=run_gnn_pipeline(_arch)
 
+# FIX-C: Report BOTH architectures as primary results.  best_gnn is used only for
+# downstream tasks (cocktail, cross-DB) where a single model is needed, NOT for
+# claiming one architecture is "better" on the reported evaluation metric.
 best_gnn=max(gnn_results,key=lambda a:gnn_results[a]["loso_mean"])
-gnn_results[best_gnn]["pred_df"].to_csv(RESULTS_DIR/"ensemble_predictions_gnn.csv",index=False)
-print(f"\n  Best GNN: {ARCH_LABEL[best_gnn]} AUC={gnn_results[best_gnn]['loso_mean']:.4f}")
+for _a in gnn_results:
+    gnn_results[_a].get("pred_df", pd.DataFrame()).to_csv(
+        RESULTS_DIR/f"predictions_{_a.lower()}.csv", index=False)
+print(f"\n  Both GNN architectures reported as primary results.")
+print(f"  GAT  LOSO AUC={gnn_results['GAT']['loso_mean']:.4f}")
+print(f"  SAGE LOSO AUC={gnn_results['SAGE']['loso_mean']:.4f}")
+print(f"  (Using {ARCH_LABEL[best_gnn]} for downstream cocktail/cross-DB tasks)")
 
 
 # ════════════════════════════════════════════════════════════════
@@ -1766,20 +1815,30 @@ print("\n[7] Saving summary tables...")
 cmp_rows=[]
 for arch,r in gnn_results.items():
     _pr_auc_mean = r["loso_df"]["pr_auc"].mean() if "pr_auc" in r["loso_df"].columns else 0.0
+    _mcc_mean = r["loso_df"]["mcc"].mean() if "mcc" in r["loso_df"].columns else 0.0
+    _f1_mean = r["loso_df"]["f1"].mean() if "f1" in r["loso_df"].columns else 0.0
     cmp_rows.append({"model":ARCH_LABEL[arch],
         "loso_mean_auc":round(r["loso_mean"],4),"loso_std":round(r["loso_std"],4),
         "loso_mean_pr_auc":round(_pr_auc_mean,4),
+        "loso_mean_mcc":round(_mcc_mean,4),
+        "loso_mean_f1":round(_f1_mean,4),
         "loso_pooled_auc":round(r["loso_pooled"]["roc_auc"],4),
         "loso_pooled_pr_auc":round(r["loso_pooled"].get("pr_auc",0),4),
+        "loso_pooled_mcc":round(r["loso_pooled"].get("mcc",0),4),
         "logo_mean_auc":round(r["logo_mean"],4),"unseen_auc":round(r["mc_auc"],4),
         "greedy_cov3":round(r["means_c"]["greedy"],3),
         "pct_species_75":round(r["pct75_c"]["greedy"],1)})
 for mname,cr in clf_results.items():
     _pr_mean = cr["df"]["pr_auc"].mean() if hasattr(cr.get("df"), "columns") and "pr_auc" in cr["df"].columns else 0.0
+    _mcc_mean = cr["df"]["mcc"].mean() if hasattr(cr.get("df"), "columns") and "mcc" in cr["df"].columns else 0.0
+    _f1_mean = cr["df"]["f1"].mean() if hasattr(cr.get("df"), "columns") and "f1" in cr["df"].columns else 0.0
     cmp_rows.append({"model":mname,"loso_mean_auc":round(cr["mean"],4),
         "loso_mean_pr_auc":round(_pr_mean,4),
+        "loso_mean_mcc":round(_mcc_mean,4),
+        "loso_mean_f1":round(_f1_mean,4),
         "loso_pooled_auc":round(cr["pooled"].get("roc_auc",0),4),
         "loso_pooled_pr_auc":round(cr["pooled"].get("pr_auc",0),4),
+        "loso_pooled_mcc":round(cr["pooled"].get("mcc",0),4),
         "logo_mean_auc":0,"unseen_auc":0,"greedy_cov3":0,"pct_species_75":0})
 pd.DataFrame(cmp_rows).to_csv(RESULTS_DIR/"model_comparison.csv",index=False)
 print("  Saved model_comparison.csv")
@@ -1798,6 +1857,8 @@ for mname, cr in clf_results.items():
     if hasattr(cr.get("df"), "index") and "roc_auc" in cr["df"].columns:
         all_model_loso[mname] = cr["df"]["roc_auc"]
 
+# FIX-D: Use only Wilcoxon signed-rank test (correct for paired per-species AUCs).
+# Mann-Whitney U treats samples as independent, which is invalid for matched LOSO folds.
 model_names_sig = list(all_model_loso.keys())
 for i in range(len(model_names_sig)):
     for j in range(i+1, len(model_names_sig)):
@@ -1811,10 +1872,7 @@ for i in range(len(model_names_sig)):
             stat_w, p_w = wilcoxon(v1, v2)
         except Exception:
             stat_w, p_w = np.nan, np.nan
-        try:
-            stat_u, p_u = mannwhitneyu(v1, v2, alternative="two-sided")
-        except Exception:
-            stat_u, p_u = np.nan, np.nan
+        _eff_size = float(np.mean(v1 - v2) / (np.std(v1 - v2) + 1e-9))
         sig_rows.append({
             "model_1": m1, "model_2": m2,
             "n_shared_species": len(shared),
@@ -1822,15 +1880,14 @@ for i in range(len(model_names_sig)):
             "mean_auc_2": round(float(v2.mean()),4),
             "wilcoxon_stat": float(stat_w) if not np.isnan(stat_w) else None,
             "wilcoxon_p": float(p_w) if not np.isnan(p_w) else None,
-            "mannwhitney_stat": float(stat_u) if not np.isnan(stat_u) else None,
-            "mannwhitney_p": float(p_u) if not np.isnan(p_u) else None,
+            "effect_size_d": round(_eff_size, 4),
             "significant_005": bool(p_w < 0.05) if not np.isnan(p_w) else False,
             "significant_001": bool(p_w < 0.01) if not np.isnan(p_w) else False,
         })
         star = "***" if (not np.isnan(p_w) and p_w < 0.001) else \
                "**"  if (not np.isnan(p_w) and p_w < 0.01)  else \
                "*"   if (not np.isnan(p_w) and p_w < 0.05)  else "ns"
-        print(f"  {m1} vs {m2}: Wilcoxon p={p_w:.4g} {star}  (n={len(shared)})")
+        print(f"  {m1} vs {m2}: Wilcoxon p={p_w:.4g} {star}  d={_eff_size:.3f}  (n={len(shared)})")
 
 sig_df = pd.DataFrame(sig_rows)
 sig_df.to_csv(RESULTS_DIR / "statistical_tests.csv", index=False)
@@ -1843,6 +1900,9 @@ print("  Saved statistical_tests.csv")
 print("\n[7c] Computing 95% bootstrap confidence intervals...")
 
 def bootstrap_ci(values, n_boot=10000, ci=0.95, seed=42):
+    """Vectorized bootstrap CI. NOTE: species-level AUCs are not fully i.i.d.
+    (shared phages, hierarchical taxonomy); this is a standard approximation.
+    For strict analysis, cluster-bootstrap by genus could be used."""
     rng = np.random.default_rng(seed)
     vals = np.asarray(values, dtype=np.float64)
     vals = vals[np.isfinite(vals)]
@@ -1850,8 +1910,8 @@ def bootstrap_ci(values, n_boot=10000, ci=0.95, seed=42):
     if n < 2:
         m = float(vals.mean()) if n == 1 else 0.0
         return m, m, m
-    boot_means = np.array([rng.choice(vals, size=n, replace=True).mean()
-                           for _ in range(n_boot)])
+    boot_idx = rng.integers(0, n, size=(n_boot, n))
+    boot_means = vals[boot_idx].mean(axis=1)
     alpha = (1 - ci) / 2
     lo = float(np.percentile(boot_means, alpha * 100))
     hi = float(np.percentile(boot_means, (1 - alpha) * 100))
@@ -1872,6 +1932,13 @@ for arch, r in gnn_results.items():
                         "mean": round(mean_pr,4), "ci_lo": round(lo_pr,4),
                         "ci_hi": round(hi_pr,4), "n_species": len(pr_aucs)})
         print(f"  {ARCH_LABEL[arch]} PR-AUC:  {mean_pr:.4f} [{lo_pr:.4f}, {hi_pr:.4f}]")
+    if "mcc" in r["loso_df"].columns:
+        mcc_vals = r["loso_df"]["mcc"].values
+        mean_mcc, lo_mcc, hi_mcc = bootstrap_ci(mcc_vals)
+        ci_rows.append({"model": ARCH_LABEL[arch], "metric": "mcc",
+                        "mean": round(mean_mcc,4), "ci_lo": round(lo_mcc,4),
+                        "ci_hi": round(hi_mcc,4), "n_species": len(mcc_vals)})
+        print(f"  {ARCH_LABEL[arch]} MCC:     {mean_mcc:.4f} [{lo_mcc:.4f}, {hi_mcc:.4f}]")
 
 for mname, cr in clf_results.items():
     if hasattr(cr.get("df"), "columns") and "roc_auc" in cr["df"].columns:
@@ -1887,6 +1954,12 @@ for mname, cr in clf_results.items():
             ci_rows.append({"model": mname, "metric": "pr_auc",
                             "mean": round(mean_pr,4), "ci_lo": round(lo_pr,4),
                             "ci_hi": round(hi_pr,4), "n_species": len(pr_aucs)})
+        if "mcc" in cr["df"].columns:
+            mcc_vals = cr["df"]["mcc"].values
+            mean_mcc, lo_mcc, hi_mcc = bootstrap_ci(mcc_vals)
+            ci_rows.append({"model": mname, "metric": "mcc",
+                            "mean": round(mean_mcc,4), "ci_lo": round(lo_mcc,4),
+                            "ci_hi": round(hi_mcc,4), "n_species": len(mcc_vals)})
 
 ci_df = pd.DataFrame(ci_rows)
 ci_df.to_csv(RESULTS_DIR / "confidence_intervals.csv", index=False)
@@ -2057,7 +2130,8 @@ best_clf_name = max(clf_results, key=lambda k: clf_results[k]["mean"])
 print(f"  Feature importance from {best_clf_name}...")
 try:
     clf_for_imp = GradientBoostingClassifier(n_estimators=200,max_depth=5,learning_rate=0.05,random_state=SEED)
-    clf_for_imp.fit(X_sc, y_all)
+    _X_imp_sc = StandardScaler().fit_transform(X_all)
+    clf_for_imp.fit(_X_imp_sc, y_all)
     fi = pd.Series(clf_for_imp.feature_importances_, index=all_feat_cols).sort_values(ascending=False)
     fig,ax=plt.subplots(figsize=(10,6))
     top_fi=fi.head(25)
@@ -2096,7 +2170,8 @@ if HAS_UMAP and HAS_TORCH:
         px_umap = torch.tensor(np.hstack([PHAGE_BASE_FIXED, phs_umap]).astype(np.float32)).to(DEVICE)
         hx_umap = torch.tensor(np.hstack([HOST_BASE, hos_umap]).astype(np.float32)).to(DEVICE)
         if best_gnn == "GAT":
-            ei_umap, ea_umap = _build_gat_graph(np.ones(len(dataset), dtype=bool))
+            _umap_ef_scaled = StandardScaler().fit_transform(EDGE_FEATS_RAW)
+            ei_umap, ea_umap = _build_gat_graph(np.ones(len(dataset), dtype=bool), _umap_ef_scaled)
             ei_umap = ei_umap.to(DEVICE); ea_umap = ea_umap.to(DEVICE)
             _umap_model = PhageHostGAT(px_umap.shape[1], hx_umap.shape[1],
                                         N_EDGE_FEATS, n_phages).to(DEVICE)
@@ -2114,7 +2189,7 @@ if HAS_UMAP and HAS_TORCH:
         for _ep in range(min(EPOCHS, 60)):
             _umap_opt.zero_grad(set_to_none=True)
             if best_gnn == "GAT":
-                _ef_u = torch.tensor(EDGE_FEATS_NP, dtype=torch.float32).to(DEVICE)
+                _ef_u = torch.tensor(_umap_ef_scaled, dtype=torch.float32).to(DEVICE)
                 _logits_u = _umap_model(px_umap, hx_umap, ei_umap, ea_umap,
                                          _all_pi_u, _all_hi_u, _ef_u)
             else:
@@ -2170,13 +2245,13 @@ print(f"  Ablation feature counts: Full={len(ablation_groups['Full model (all fe
       f"Baseline={len(ablation_groups['Baseline (k3dist/k6dist/GCdiff/Homology only)'])}")
 for name, cols in ablation_groups.items():
     if not cols: continue
-    X_abl_sc = StandardScaler().fit_transform(
-        dataset[cols].fillna(0.0).values.astype(np.float32))
+    _X_abl_raw = dataset[cols].fillna(0.0).values.astype(np.float32)
     fold_aucs=[]
     for sp in valid_species:
         tm=(dataset["host"]==sp).values
-        Xtr,ytr=X_abl_sc[~tm],y_all[~tm]
-        Xte,yte=X_abl_sc[tm], y_all[tm]
+        _abl_sc = StandardScaler()
+        Xtr = _abl_sc.fit_transform(_X_abl_raw[~tm]); ytr = y_all[~tm]
+        Xte = _abl_sc.transform(_X_abl_raw[tm]);       yte = y_all[tm]
         if len(np.unique(yte))<2: continue
         clf=RandomForestClassifier(n_estimators=100,random_state=SEED,n_jobs=-1)
         clf.fit(Xtr,ytr); p=clf.predict_proba(Xte)[:,1]
@@ -2267,8 +2342,9 @@ for sp in _hard_valid_species:
     tm = (dataset["host"]==sp).values & sp_mask
     tr = sp_mask & ~tm
     if tr.sum() < 10 or tm.sum() < 3: continue
-    Xtr = X_sc[tr]; ytr = y_all[tr]
-    Xte = X_sc[tm]; yte = y_all[tm]
+    _hn_sc = StandardScaler()
+    Xtr = _hn_sc.fit_transform(X_all[tr]); ytr = y_all[tr]
+    Xte = _hn_sc.transform(X_all[tm]); yte = y_all[tm]
     if len(np.unique(yte)) < 2: continue
     clf = RandomForestClassifier(n_estimators=100, random_state=SEED, n_jobs=-1)
     clf.fit(Xtr, ytr)
@@ -2461,11 +2537,13 @@ if _phagesdb_pairs:
             _combined_test = np.zeros(len(_combined), dtype=bool)
             _combined_test[_orig_len:] = True
             _pdb_edge = np.zeros((len(_tmp_rows), N_EDGE_FEATS), dtype=np.float32)
-            _saved_ef = EDGE_FEATS_NP
+            _saved_ef = EDGE_FEATS_RAW
             _saved_ds = dataset
             try:
-                EDGE_FEATS_NP = np.vstack([_saved_ef, _pdb_edge])
+                EDGE_FEATS_RAW = np.vstack([_saved_ef, _pdb_edge])
                 dataset = _combined
+                print("  NOTE: External test pairs have zero-filled edge features "
+                      "(no genomic pair data); model relies on node features + topology only.")
                 proba_pdb, yte_pdb = run_fold(_combined_train, _combined_test, arch=best_gnn)
                 pdb_m = metrics(yte_pdb, proba_pdb)
                 cross_db_results["phagesdb"] = pdb_m
@@ -2474,7 +2552,7 @@ if _phagesdb_pairs:
             except Exception as e:
                 print(f"  PhagesDB validation failed: {e}")
             finally:
-                EDGE_FEATS_NP = _saved_ef
+                EDGE_FEATS_RAW = _saved_ef
                 dataset = _saved_ds
         else:
             print(f"  PhagesDB: insufficient test data ({len(_pdb_test)} pairs, "
@@ -2566,11 +2644,13 @@ if _gpdb_pairs:
             _gpdb_test_mask = np.zeros(len(_gpdb_combined), dtype=bool)
             _gpdb_test_mask[_gpdb_orig_len:] = True
             _gpdb_edge = np.zeros((len(_gpdb_tmp), N_EDGE_FEATS), dtype=np.float32)
-            _saved_ef2 = EDGE_FEATS_NP
+            _saved_ef2 = EDGE_FEATS_RAW
             _saved_ds2 = dataset
             try:
-                EDGE_FEATS_NP = np.vstack([_saved_ef2, _gpdb_edge])
+                EDGE_FEATS_RAW = np.vstack([_saved_ef2, _gpdb_edge])
                 dataset = _gpdb_combined
+                print("  NOTE: GPDB test pairs have zero-filled edge features "
+                      "(no genomic pair data); model relies on node features + topology only.")
                 _proba_gpdb, _yte_gpdb = run_fold(_gpdb_train_mask, _gpdb_test_mask, arch=best_gnn)
                 _gpdb_m = metrics(_yte_gpdb, _proba_gpdb)
                 cross_db_results["gpdb"] = _gpdb_m
@@ -2579,7 +2659,7 @@ if _gpdb_pairs:
             except Exception as e:
                 print(f"  GPDB validation failed: {e}")
             finally:
-                EDGE_FEATS_NP = _saved_ef2
+                EDGE_FEATS_RAW = _saved_ef2
                 dataset = _saved_ds2
         else:
             print(f"  GPDB: insufficient test data after filtering")
@@ -2653,6 +2733,255 @@ save_fig(fig, "12_calibration_curves")
 print("  Saved plot: 12_calibration_curves.png")
 
 # ════════════════════════════════════════════════════════════════
+# SECTION 10 — GAT ATTENTION WEIGHT VISUALIZATION
+# ════════════════════════════════════════════════════════════════
+print("\n[10] GAT attention weight analysis...")
+
+if HAS_TORCH and "GAT" in gnn_results:
+    try:
+        _attn_all_mask = np.ones(len(dataset), dtype=bool)
+        _attn_phs, _attn_hos = build_structural(dataset, _attn_all_mask)
+        _attn_px_np = np.hstack([PHAGE_BASE_FIXED, _attn_phs]).astype(np.float32)
+        _attn_hx_np = np.hstack([HOST_BASE, _attn_hos]).astype(np.float32)
+        _attn_px = torch.tensor(_attn_px_np, dtype=torch.float32).to(DEVICE)
+        _attn_hx = torch.tensor(_attn_hx_np, dtype=torch.float32).to(DEVICE)
+        _attn_ef_sc = StandardScaler().fit_transform(EDGE_FEATS_RAW)
+        _attn_ei, _attn_ea = _build_gat_graph(_attn_all_mask, _attn_ef_sc)
+        _attn_ei = _attn_ei.to(DEVICE); _attn_ea = _attn_ea.to(DEVICE)
+
+        _attn_model = PhageHostGAT(
+            _attn_px_np.shape[1], _attn_hx_np.shape[1], N_EDGE_FEATS, n_phages
+        ).to(DEVICE)
+
+        _attn_opt = torch.optim.AdamW(_attn_model.parameters(), lr=LR, weight_decay=WD)
+        _attn_crit = nn.BCEWithLogitsLoss()
+        _attn_pi = torch.tensor(dataset["phage_idx"].values, dtype=torch.long).to(DEVICE)
+        _attn_hi = torch.tensor(dataset["host_idx"].values,  dtype=torch.long).to(DEVICE)
+        _attn_lb = torch.tensor(all_labels.astype(np.float32)).to(DEVICE)
+        _attn_ef_t = torch.tensor(_attn_ef_sc, dtype=torch.float32).to(DEVICE)
+
+        _attn_model.train()
+        for _ep in range(min(EPOCHS, 80)):
+            _attn_opt.zero_grad(set_to_none=True)
+            _logits = _attn_model(_attn_px, _attn_hx, _attn_ei, _attn_ea,
+                                   _attn_pi, _attn_hi, _attn_ef_t)
+            _loss = _attn_crit(_logits, _attn_lb)
+            _loss.backward()
+            torch.nn.utils.clip_grad_norm_(_attn_model.parameters(), 1.0)
+            _attn_opt.step()
+
+        attn_weights_all, attn_ei_out = _attn_model.get_attention_weights(
+            _attn_px, _attn_hx, _attn_ei, _attn_ea)
+
+        print(f"  Extracted attention weights from {len(attn_weights_all)} GAT layers")
+
+        # --- Plot 13a: Attention weight distribution per layer ---
+        fig, axes = plt.subplots(1, len(attn_weights_all), figsize=(5*len(attn_weights_all), 4))
+        if len(attn_weights_all) == 1:
+            axes = [axes]
+        for li, alpha_l in enumerate(attn_weights_all):
+            ax = axes[li]
+            aw = alpha_l.numpy().flatten()
+            aw = aw[np.isfinite(aw)]
+            ax.hist(aw, bins=60, color=ARCH_COLOR["GAT"], alpha=0.8, edgecolor="white", density=True)
+            ax.set_xlabel("Attention Weight", fontsize=10)
+            ax.set_ylabel("Density", fontsize=10)
+            ax.set_title(f"Layer {li+1} (mean={aw.mean():.4f})", fontsize=10, fontweight="bold")
+            ax.axvline(aw.mean(), color="black", linestyle="--", lw=1.5, label=f"Mean")
+            _p95 = np.percentile(aw, 95)
+            ax.axvline(_p95, color="red", linestyle=":", lw=1.5, label=f"95th pctl")
+            ax.legend(fontsize=7); ax.grid(alpha=0.3)
+        plt.suptitle("GAT Attention Weight Distributions per Layer",
+                     fontsize=12, fontweight="bold")
+        plt.tight_layout()
+        save_fig(fig, "13a_attention_distributions")
+
+        # --- Extract top-attention phage-host edges from last layer ---
+        _last_alpha = attn_weights_all[-1].numpy()
+        if _last_alpha.ndim == 2:
+            _last_alpha_mean = _last_alpha.mean(axis=1)
+        else:
+            _last_alpha_mean = _last_alpha.flatten()
+
+        _graph_ei = _attn_ei.cpu().numpy()
+        _n_graph_edges = _graph_ei.shape[1]
+        _alpha_trunc = _last_alpha_mean[:_n_graph_edges]
+
+        _ph_host_edges = []
+        for eidx in range(_n_graph_edges):
+            src, dst = int(_graph_ei[0, eidx]), int(_graph_ei[1, eidx])
+            is_ph_to_host = (src < n_phages and dst >= n_phages)
+            is_host_to_ph = (src >= n_phages and dst < n_phages)
+            if is_ph_to_host:
+                pi, hi = src, dst - n_phages
+                _ph_host_edges.append({
+                    "phage": phage_list[pi], "host": host_list[hi],
+                    "attention": float(_alpha_trunc[eidx]),
+                    "phage_idx": pi, "host_idx": hi})
+            elif is_host_to_ph:
+                pi, hi = dst, src - n_phages
+                _ph_host_edges.append({
+                    "phage": phage_list[pi], "host": host_list[hi],
+                    "attention": float(_alpha_trunc[eidx]),
+                    "phage_idx": pi, "host_idx": hi})
+
+        if _ph_host_edges:
+            _attn_df = pd.DataFrame(_ph_host_edges)
+            _attn_agg = _attn_df.groupby(["phage","host"]).agg(
+                mean_attn=("attention","mean"),
+                max_attn=("attention","max"),
+                n_edges=("attention","count")).reset_index()
+
+            _pos_pairs = set(zip(
+                dataset.loc[dataset["label"]==1, "phage"],
+                dataset.loc[dataset["label"]==1, "host"]))
+            _attn_agg["is_positive"] = _attn_agg.apply(
+                lambda r: (r["phage"], r["host"]) in _pos_pairs, axis=1)
+
+            # Biological feature correlation
+            _attn_agg["genus"] = _attn_agg["host"].str.split().str[0]
+            _bio_corr_rows = []
+            for _, row in _attn_agg.iterrows():
+                ph, ho = row["phage"], row["host"]
+                _mask = (dataset["phage"]==ph) & (dataset["host"]==ho)
+                if _mask.any():
+                    _idx = _mask.idxmax()
+                    _bio_corr_rows.append({
+                        "phage": ph, "host": ho,
+                        "mean_attn": row["mean_attn"],
+                        "is_positive": row["is_positive"],
+                        "tetra_corr": float(dataset.loc[_idx, "tetra_corr"]) if "tetra_corr" in dataset.columns else 0.0,
+                        "cub_dist":   float(dataset.loc[_idx, "cub_dist"])   if "cub_dist" in dataset.columns else 0.0,
+                        "gc_match":   float(dataset.loc[_idx, "gc_match"])   if "gc_match" in dataset.columns else 0.0,
+                        "k3dist":     float(dataset.loc[_idx, "k3dist"]),
+                    })
+            _bio_attn = pd.DataFrame(_bio_corr_rows) if _bio_corr_rows else pd.DataFrame()
+
+            # --- Plot 13b: High-attention edges vs biological features ---
+            if len(_bio_attn) > 20:
+                fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+                bio_features = [
+                    ("tetra_corr", "Tetranucleotide Correlation",
+                     "Higher tet. correlation = more similar codon adaptation\n"
+                     "(suggests co-evolutionary RBP-receptor specificity)"),
+                    ("cub_dist", "Codon Usage Distance",
+                     "Lower distance = shared translational machinery\n"
+                     "(potential CRISPR spacer match / adaptation signal)"),
+                    ("gc_match", "GC Content Match",
+                     "Higher match = similar genomic composition\n"
+                     "(supports receptor-binding compatibility)"),
+                    ("k3dist", "3-mer Distance (k3dist)",
+                     "Sequence composition similarity\n"
+                     "(correlates with host range specificity)"),
+                ]
+                for ax_idx, (feat, title, bio_note) in enumerate(bio_features):
+                    ax = axes[ax_idx // 2][ax_idx % 2]
+                    if feat not in _bio_attn.columns or _bio_attn[feat].abs().sum() < 1e-6:
+                        ax.text(0.5, 0.5, f"No {feat} data", ha="center", va="center",
+                                transform=ax.transAxes, fontsize=12)
+                        ax.set_title(title); continue
+                    pos_data = _bio_attn[_bio_attn["is_positive"]]
+                    neg_data = _bio_attn[~_bio_attn["is_positive"]]
+                    if len(pos_data) > 2:
+                        ax.scatter(pos_data[feat], pos_data["mean_attn"],
+                                   c="#1a9850", alpha=0.4, s=15, label=f"Positive (n={len(pos_data)})")
+                    if len(neg_data) > 2:
+                        ax.scatter(neg_data[feat], neg_data["mean_attn"],
+                                   c="#F44336", alpha=0.3, s=10, label=f"Negative (n={len(neg_data)})")
+                    from scipy.stats import spearmanr
+                    _valid = _bio_attn[[feat, "mean_attn"]].dropna()
+                    if len(_valid) > 5:
+                        _rho, _pval = spearmanr(_valid[feat], _valid["mean_attn"])
+                        ax.text(0.02, 0.98, f"Spearman ρ={_rho:.3f}\np={_pval:.2e}",
+                                transform=ax.transAxes, fontsize=8, va="top",
+                                bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.8))
+                    ax.set_xlabel(title, fontsize=10)
+                    ax.set_ylabel("Mean GAT Attention", fontsize=10)
+                    ax.set_title(f"Attention vs {title}\n{bio_note}", fontsize=9, fontweight="bold")
+                    ax.legend(fontsize=7, loc="lower right"); ax.grid(alpha=0.3)
+                plt.suptitle("GAT Attention Weights vs Biological Interaction Features\n"
+                             "High attention on biologically meaningful edges validates "
+                             "learned representations",
+                             fontsize=12, fontweight="bold")
+                plt.tight_layout()
+                save_fig(fig, "13b_attention_vs_biology")
+
+            # --- Plot 13c: Top-attention edges heatmap (top genera) ---
+            _top_genera = _attn_agg.groupby("genus")["mean_attn"].count().nlargest(10).index.tolist()
+            _top_attn_sub = _attn_agg[_attn_agg["genus"].isin(_top_genera)].copy()
+            if len(_top_attn_sub) > 10:
+                _pivot = _top_attn_sub.groupby(
+                    [_top_attn_sub["phage"].str[:20], "host"]
+                )["mean_attn"].mean().reset_index()
+                _top_hosts = _pivot.groupby("host")["mean_attn"].mean().nlargest(20).index
+                _top_phages = _pivot.groupby("phage")["mean_attn"].mean().nlargest(20).index
+                _heatmap_data = _pivot[
+                    _pivot["host"].isin(_top_hosts) & _pivot["phage"].isin(_top_phages)
+                ].pivot_table(index="host", columns="phage", values="mean_attn", aggfunc="mean")
+                if _heatmap_data.shape[0] >= 3 and _heatmap_data.shape[1] >= 3:
+                    fig, ax = plt.subplots(figsize=(max(8, _heatmap_data.shape[1]*0.5),
+                                                     max(6, _heatmap_data.shape[0]*0.4)))
+                    sns.heatmap(_heatmap_data.fillna(0), ax=ax, cmap="YlOrRd",
+                                xticklabels=True, yticklabels=True,
+                                cbar_kws={"label": "Mean Attention Weight"})
+                    ax.set_xlabel("Phage", fontsize=10)
+                    ax.set_ylabel("Host", fontsize=10)
+                    ax.set_title("GAT Attention Heatmap — Top Phage-Host Pairs\n"
+                                 "Bright cells = edges the model attends to most strongly",
+                                 fontsize=11, fontweight="bold")
+                    ax.tick_params(axis="x", labelsize=6, rotation=45)
+                    ax.tick_params(axis="y", labelsize=7)
+                    plt.tight_layout()
+                    save_fig(fig, "13c_attention_heatmap")
+
+            # --- Plot 13d: Attention by positive vs negative label ---
+            if len(_attn_agg) > 20:
+                fig, ax = plt.subplots(figsize=(8, 5))
+                _pos_attn = _attn_agg.loc[_attn_agg["is_positive"], "mean_attn"].values
+                _neg_attn = _attn_agg.loc[~_attn_agg["is_positive"], "mean_attn"].values
+                parts = ax.violinplot([_pos_attn, _neg_attn] if len(_neg_attn) > 0
+                                       else [_pos_attn],
+                                       positions=[1, 2] if len(_neg_attn) > 0 else [1],
+                                       showmeans=True, showmedians=True)
+                for pc, color in zip(parts["bodies"],
+                                      ["#1a9850", "#F44336"][:len(parts["bodies"])]):
+                    pc.set_facecolor(color); pc.set_alpha(0.6)
+                _labels = ["Positive\n(infection)", "Negative\n(no infection)"]
+                ax.set_xticks([1, 2] if len(_neg_attn) > 0 else [1])
+                ax.set_xticklabels(_labels[:2 if len(_neg_attn) > 0 else 1], fontsize=11)
+                ax.set_ylabel("Mean GAT Attention Weight", fontsize=11)
+                _title_parts = f"Positive mean={_pos_attn.mean():.4f}"
+                if len(_neg_attn) > 0:
+                    _title_parts += f"  Negative mean={_neg_attn.mean():.4f}"
+                    try:
+                        _, _pv = wilcoxon(
+                            np.random.default_rng(42).choice(_pos_attn, min(500, len(_pos_attn)), replace=False),
+                            np.random.default_rng(42).choice(_neg_attn, min(500, len(_neg_attn)), replace=False)
+                        ) if min(len(_pos_attn), len(_neg_attn)) >= 5 else (0, 1.0)
+                    except Exception:
+                        _pv = 1.0
+                    _title_parts += f"\nWilcoxon p={_pv:.2e}"
+                ax.set_title(f"GAT Attention: Positive vs Negative Edges\n{_title_parts}",
+                             fontsize=11, fontweight="bold")
+                ax.grid(alpha=0.3)
+                plt.tight_layout()
+                save_fig(fig, "13d_attention_pos_vs_neg")
+
+            _attn_agg.to_csv(RESULTS_DIR / "gat_attention_edges.csv", index=False)
+            if len(_bio_attn) > 0:
+                _bio_attn.to_csv(RESULTS_DIR / "gat_attention_biology.csv", index=False)
+            print(f"  Saved attention analysis: {len(_attn_agg)} phage-host edge pairs")
+        else:
+            print("  No phage-host edges found in attention graph")
+    except Exception as e:
+        import traceback
+        print(f"  Attention analysis failed: {e}")
+        traceback.print_exc()
+else:
+    print("  Skipping attention analysis (no PyTorch or no GAT results)")
+
+
+# ════════════════════════════════════════════════════════════════
 # FINAL SUMMARY
 # ════════════════════════════════════════════════════════════════
 print("\n" + "="*66)
@@ -2660,9 +2989,13 @@ print("  FINAL RESULTS")
 print("="*66)
 best_g=gnn_results["GAT"]; best_s=gnn_results["SAGE"]
 
-# PR-AUC from LOSO results
-_g_pr = best_g["loso_df"]["pr_auc"].mean() if "pr_auc" in best_g["loso_df"].columns else 0.0
-_s_pr = best_s["loso_df"]["pr_auc"].mean() if "pr_auc" in best_s["loso_df"].columns else 0.0
+# PR-AUC and MCC from LOSO results
+_g_pr  = best_g["loso_df"]["pr_auc"].mean() if "pr_auc" in best_g["loso_df"].columns else 0.0
+_s_pr  = best_s["loso_df"]["pr_auc"].mean() if "pr_auc" in best_s["loso_df"].columns else 0.0
+_g_mcc = best_g["loso_df"]["mcc"].mean() if "mcc" in best_g["loso_df"].columns else 0.0
+_s_mcc = best_s["loso_df"]["mcc"].mean() if "mcc" in best_s["loso_df"].columns else 0.0
+_g_f1  = best_g["loso_df"]["f1"].mean() if "f1" in best_g["loso_df"].columns else 0.0
+_s_f1  = best_s["loso_df"]["f1"].mean() if "f1" in best_s["loso_df"].columns else 0.0
 
 # 95% CI strings
 _g_ci = ""
@@ -2674,20 +3007,23 @@ for r in ci_rows:
         _s_ci = f" [{r['ci_lo']:.4f}, {r['ci_hi']:.4f}]"
 
 print(f"""
-  ┌────────────────────────────────────────────────────────────────────┐
-  │  Metric                  GAT+Edge MLP         SAGE+Residual       │
-  ├────────────────────────────────────────────────────────────────────┤
-  │  LOSO mean ROC-AUC  {best_g['loso_mean']:.4f}±{best_g['loso_std']:.4f}      {best_s['loso_mean']:.4f}±{best_s['loso_std']:.4f}      │
-  │  LOSO 95% CI        {_g_ci:<20s} {_s_ci:<20s} │
-  │  LOSO mean PR-AUC   {_g_pr:.4f}              {_s_pr:.4f}              │
-  │  LOSO pooled AUC    {best_g['loso_pooled']['roc_auc']:.4f}              {best_s['loso_pooled']['roc_auc']:.4f}              │
-  │  LOGO mean AUC      {best_g['logo_mean']:.4f}              {best_s['logo_mean']:.4f}              │
-  │  Unseen strain      {best_g['mc_auc']:.4f}              {best_s['mc_auc']:.4f}              │
-  │  Greedy cov@3       {best_g['means_c']['greedy']:.3f}               {best_s['means_c']['greedy']:.3f}               │
-  └────────────────────────────────────────────────────────────────────┘""")
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │  Metric                  GAT+Edge MLP         SAGE+Residual         │
+  ├──────────────────────────────────────────────────────────────────────┤
+  │  LOSO mean ROC-AUC  {best_g['loso_mean']:.4f}±{best_g['loso_std']:.4f}      {best_s['loso_mean']:.4f}±{best_s['loso_std']:.4f}        │
+  │  LOSO 95% CI        {_g_ci:<20s} {_s_ci:<20s}   │
+  │  LOSO mean PR-AUC   {_g_pr:.4f}              {_s_pr:.4f}                │
+  │  LOSO mean MCC      {_g_mcc:.4f}              {_s_mcc:.4f}                │
+  │  LOSO mean F1       {_g_f1:.4f}              {_s_f1:.4f}                │
+  │  LOSO pooled AUC    {best_g['loso_pooled']['roc_auc']:.4f}              {best_s['loso_pooled']['roc_auc']:.4f}                │
+  │  LOGO mean AUC      {best_g['logo_mean']:.4f}              {best_s['logo_mean']:.4f}                │
+  │  Unseen strain      {best_g['mc_auc']:.4f}              {best_s['mc_auc']:.4f}                │
+  │  Greedy cov@3       {best_g['means_c']['greedy']:.3f}               {best_s['means_c']['greedy']:.3f}                 │
+  └──────────────────────────────────────────────────────────────────────┘""")
 for mname,cr in clf_results.items():
     _clf_pr = cr["df"]["pr_auc"].mean() if hasattr(cr.get("df"), "columns") and "pr_auc" in cr["df"].columns else 0.0
-    print(f"  {mname:<20} LOSO ROC-AUC={cr['mean']:.4f}  PR-AUC={_clf_pr:.4f}")
+    _clf_mcc = cr["df"]["mcc"].mean() if hasattr(cr.get("df"), "columns") and "mcc" in cr["df"].columns else 0.0
+    print(f"  {mname:<20} LOSO ROC-AUC={cr['mean']:.4f}  PR-AUC={_clf_pr:.4f}  MCC={_clf_mcc:.4f}")
 
 if sig_rows:
     print("\n  Statistical significance (Wilcoxon signed-rank):")
@@ -2727,13 +3063,19 @@ print(f"""
     10_dataset_overview.png       — dataset composition
     11_confidence_intervals.png   — forest plot with 95% bootstrap CI
     12_calibration_curves.png     — reliability diagrams for all models
+    13a_attention_distributions   — GAT attention weight distributions per layer
+    13b_attention_vs_biology      — attention vs biological features (tet corr, CUB, GC, k3)
+    13c_attention_heatmap         — top phage-host pair attention heatmap
+    13d_attention_pos_vs_neg      — attention on positive vs negative edges
 
   CSVs saved:
-    model_comparison.csv          — all models with ROC-AUC + PR-AUC
-    statistical_tests.csv         — pairwise Wilcoxon + Mann-Whitney tests
-    confidence_intervals.csv      — 95% bootstrap CI for all models
+    model_comparison.csv          — all models with ROC-AUC, PR-AUC, MCC, F1
+    statistical_tests.csv         — pairwise Wilcoxon signed-rank tests
+    confidence_intervals.csv      — 95% bootstrap CI for all models + metrics
     ablation_results.csv          — classical + GNN ablation results
     cross_database_validation.csv — external validation results
     hard_negative_sensitivity.csv — within-genus hard negative AUC
+    gat_attention_edges.csv       — per-edge attention weights
+    gat_attention_biology.csv     — attention correlated with biological features
 """)
 print("  DONE!")
