@@ -1,0 +1,442 @@
+species,status,level
+acholeplasma_laidlawii,ok,Contig
+achromobacter_xylosoxidans,ok,Contig
+acidovorax_citrulli,ok,Contig
+acinetobacter_baumannii,ok,Contig
+acinetobacter_johnsonii,ok,Contig
+acinetobacter_pittii,ok,Contig
+acinetobacter_soli,ok,Contig
+actinomyces_naeslundii,ok,Contig
+aeromonas_hydrophila,ok,Contig
+aeromonas_media,ok,Contig
+aeromonas_salmonicida,ok,Contig
+aggregatibacter_actinomycetemcomitans,ok,Contig
+agrobacterium_tumefaciens,ok,Contig
+aliivibrio fischeri,ok,Contig
+aliivibrio fischeri es114,ok,Contig
+alteromonas_macleodii,ok,Contig
+alteromonas_marina,ok,Contig
+anabaena_spirioides,no_taxon,
+anabaena_variabilis,ok,Contig
+azospirillum_brasilense,ok,Contig
+bacillus_alcalophilus,ok,Contig
+bacillus_anthracis,ok,Contig
+bacillus_borstelensis,ok,Contig
+bacillus_cereus,ok,Contig
+bacillus_clarkii,ok,Contig
+bacillus_halmapalus,ok,Contig
+bacillus_licheniformis,ok,Contig
+bacillus_megaterium,ok,Contig
+bacillus_psychrosaccharolyticus,ok,Contig
+bacillus_pumilus,ok,Contig
+bacillus_sphaericus,ok,Contig
+bacillus_subtilis,ok,Contig
+bacillus_thuringiensis,ok,Contig
+bacillus_weihenstephanensis,ok,Contig
+bacteroides_fragilis,ok,Contig
+bdellovibrio_bacteriovorus,ok,Contig
+bordetella_bronchiseptica,ok,Contig
+brevibacillus_brevis,ok,Contig
+brevibacillus_laterosporus,ok,Contig
+brochothrix_thermosphacta,ok,Contig
+brucella_abortus,ok,Contig
+brucella_canis,ok,Contig
+brucella_ceti,ok,Contig
+brucella_inopinata,ok,Contig
+brucella_melitensis,ok,Contig
+brucella_microti,ok,Contig
+brucella_neotomae,ok,Contig
+brucella_ovis,ok,Contig
+brucella_pinnipedialis,ok,Contig
+brucella_suis,ok,Contig
+brucella_vulpis,ok,Contig
+burkholderia_ambifaria,ok,Contig
+burkholderia_cenocepacia,ok,Contig
+burkholderia_cepacia,ok,Contig
+burkholderia_pseudomallei,ok,Contig
+burkholderia_pyrrocinia,ok,Contig
+burkholderia_thailandensis,ok,Contig
+campylobacter_coli,ok,Contig
+campylobacter_jejuni,ok,Contig
+caulobacter_crescentus,ok,Contig
+cellulophaga_baltica,ok,Contig
+chlamydia_psittaci,ok,Contig
+chlamydia_trachomatis,ok,Contig
+chlamydophila_abortus,ok,Contig
+chlamydophila_pneumoniae,ok,Contig
+citrobacter_freundii,ok,Contig
+citrobacter_rodentium,ok,Contig
+clavibacter_michiganensis,ok,Contig
+clostridium_botulinum,ok,Contig
+clostridium_difficile,no_taxon,
+clostridium_perfringens,ok,Contig
+clostridium_sporogenes,ok,Contig
+clostridium_tetani,ok,Contig
+colwellia_psychrerythaea,no_taxon,
+corynebacterium_glutamicum,ok,Contig
+corynebacterium_vitaeruminis,ok,Contig
+croceibacter_atlanticus,ok,Contig
+cronobacter_dublinensis,ok,Contig
+cronobacter_malonaticus,ok,Contig
+cronobacter_sakazakii,ok,Contig
+cronobacter_turicensis,ok,Contig
+cronobacter_universalis,ok,Contig
+delftia_acidovorans,ok,Contig
+delftia_tsuruhatensis,ok,Contig
+dickeya_chrysanthemi,ok,Contig
+dickeya_dadantii,ok,Contig
+dickeya_dianthicola,ok,Contig
+dickeya_dieffenbachiae,ok,Contig
+dickeya_solani,ok,Contig
+dickeya_zeae,ok,Contig
+dinoroseobacter_shibae,ok,Contig
+edwardsiella_ictaluri,ok,Contig
+enterobacter_aerogenes,ok,Contig
+enterobacter_agglomerans,ok,Contig
+enterobacter_cancerogenus,ok,Contig
+enterobacter_cloacae,ok,Contig
+enterobacter_sakazakii,ok,Contig
+enterococcus_faecalis,ok,Contig
+enterococcus_faecium,ok,Contig
+enterovibrio norvegicus,ok,Contig
+erwinia_amylovora,ok,Contig
+erwinia_billingiae,ok,Contig
+erwinia_persicina,ok,Contig
+erwinia_pyrifoliae,ok,Contig
+erysipelothrix_rhusiopathiae,ok,Contig
+erythrobacter_litoralis,ok,Contig
+erythrobacter_longus,ok,Contig
+escherichia_coli,ok,Contig
+flavobacterium_columnare,ok,Contig
+flavobacterium_psychrophilum,ok,Contig
+fusobacterium_nucleatum,ok,Contig
+geobacillus_kaustophilus,ok,Contig
+geobacillus_stearothermophilus,ok,Contig
+gluconobacter_cerinus,ok,Contig
+gluconobacter_oxydans,ok,Contig
+gordonia_alkanivorans,ok,Contig
+gordonia_malaquae,ok,Contig
+gordonia_neofelifaecis,ok,Contig
+gordonia_sputi,ok,Contig
+gordonia_terrae,ok,Contig
+haemophilus_influenzae,ok,Contig
+haemophilus_parasuis,ok,Contig
+halomonas_aquamarina,ok,Contig
+helicobacter_pylori,ok,Contig
+idiomarina_fontislapidosi,ok,Contig
+idiomarina_loihiensis,ok,Contig
+janthinobacterium_lividum,ok,Contig
+klebsiella_oxytoca,ok,Contig
+klebsiella_pneumoniae,ok,Contig
+kocuria_rosea,ok,Contig
+lactobacillus_brevis,ok,Contig
+lactobacillus_casei,ok,Contig
+lactobacillus_coryniformis,ok,Contig
+lactobacillus_crispatus,ok,Contig
+lactobacillus_curvatus,ok,Contig
+lactobacillus_delbrueckii,ok,Contig
+lactobacillus_fermentum,ok,Contig
+lactobacillus_fructivorans,ok,Contig
+lactobacillus_fructosus,ok,Contig
+lactobacillus_gasseri,ok,Contig
+lactobacillus_hilgardii,no_taxon,
+lactobacillus_jensenii,ok,Contig
+lactobacillus_johnsonii,ok,Contig
+lactobacillus_mali,ok,Contig
+lactobacillus_paracasei,ok,Contig
+lactobacillus_paraplantarum,ok,Contig
+lactobacillus_pentosaceus,no_taxon,
+lactobacillus_plantarum,no_taxon,
+lactobacillus_reuteri,ok,Contig
+lactobacillus_rhamnosus,ok,Contig
+lactobacillus_salivarius,ok,Contig
+lactococcus_garvieae,ok,Contig
+lactococcus_lactis,ok,Contig
+leptolyngbya_foveolarum,ok,Contig
+leuconostoc_fallax,ok,Contig
+leuconostoc_lactis,ok,Contig
+leuconostoc_mesenteroides,ok,Contig
+leuconostoc_paramesenteroides,ok,Contig
+leuconostoc_pseudomesenteroides,ok,Contig
+listeria_innocua,ok,Contig
+listeria_ivanovii,ok,Contig
+listeria_monocytogenes,ok,Contig
+mannheimia_haemolytica,ok,Contig
+mesorhizobium_loti,ok,Contig
+microbacterium_foliorum,ok,Contig
+microbacterium_oxydans,ok,Contig
+microcystis_aeruginosa,ok,Contig
+morganella_morganii,ok,Contig
+mycobacterium_abscessus,ok,Contig
+mycobacterium_avium,ok,Contig
+mycobacterium_phlei,ok,Contig
+mycobacterium_smegmatis,no_taxon,
+mycobacterium_tuberculosis,ok,Contig
+mycoplasma_arthritidis,no_taxon,
+mycoplasma_pulmonis,no_taxon,
+myxococcus_xanthus,ok,Contig
+natrialba_magadii,ok,Contig
+nocardia_brasiliensis,ok,Contig
+nocardia_otitidiscaviarum,ok,Contig
+nostoc_linckia,ok,Contig
+paenibacillus_alvei,ok,Contig
+paenibacillus_amylolyticus,ok,Contig
+paenibacillus_apiarius,ok,Contig
+paenibacillus_castaneae,ok,Contig
+paenibacillus_elgii,ok,Contig
+paenibacillus_fonticola,ok,Contig
+paenibacillus_glucanolyticus,ok,Contig
+paenibacillus_humicus,ok,Contig
+paenibacillus_lactis,ok,Contig
+paenibacillus_larvae,ok,Contig
+paenibacillus_lautus,ok,Contig
+paenibacillus_nanensis,ok,Contig
+paenibacillus_pabuli,ok,Contig
+paenibacillus_peoriae,ok,Contig
+paenibacillus_polymyxa,ok,Contig
+paenibacillus_popilliae,ok,Contig
+pantoea_agglomerans,ok,Contig
+pantoea_ananatis,ok,Contig
+parabacteroides_distasonis,ok,Contig
+parabacteroides_merdae,ok,Contig
+paracoccus_denitrificans,ok,Contig
+paracoccus_marcusii,ok,Contig
+pasteurella_multocida,ok,Contig
+pectobacterium_atrosepticum,ok,Contig
+pectobacterium_carotovorum,ok,Contig
+pediococcus_dextrinicus,no_taxon,
+pediococcus_pentosaceus,ok,Contig
+pedobacter_africanus,ok,Contig
+phormidium_foveolarum,ok,Contig
+photobacterium_damselae,ok,Contig
+planomicrobium_okeanokoites,ok,Contig
+porphyromonas_gingivalis,ok,Contig
+prochlorococcus_marinus,ok,Contig
+propionibacterium_acnes,ok,Contig
+propionibacterium_freudenreichii,ok,Contig
+proteus_mirabilis,ok,Contig
+proteus_vulgaris,ok,Contig
+providencia_stuartii,ok,Contig
+pseudoalteromonas_arctica,ok,Contig
+pseudoalteromonas_atlantica,ok,Contig
+pseudoalteromonas_marina,ok,Contig
+pseudoalteromonas_nigrifaciens,ok,Contig
+pseudoalteromonas_phenolica,ok,Contig
+pseudoalteromonas_translucida,ok,Contig
+pseudomonas_aeruginosa,ok,Contig
+pseudomonas_agarici,ok,Contig
+pseudomonas_chlororaphis,ok,Contig
+pseudomonas_cichorii,ok,Contig
+pseudomonas_costantinii,ok,Contig
+pseudomonas_fluorescens,ok,Contig
+pseudomonas_gingeri,ok,Contig
+pseudomonas_poae,ok,Contig
+pseudomonas_putida,ok,Contig
+pseudomonas_putrefaciens,ok,Contig
+pseudomonas_rhizosphaerae,ok,Contig
+pseudomonas_segetis,ok,Contig
+pseudomonas_syringae,ok,Contig
+pseudomonas_taetrolens,ok,Contig
+pseudomonas_tolaasii,ok,Contig
+ralstonia_pickettii,ok,Contig
+ralstonia_solanacearum,ok,Contig
+raoultella_ornithinolytica,ok,Contig
+rhizobium_etli,ok,Contig
+rhizobium_gallicum,ok,Contig
+rhizobium_leguminosarum,ok,Contig
+rhizobium_leucaenae,ok,Contig
+rhizobium_radiobacter,ok,Contig
+rhodobacter_capsulatus,ok,Contig
+rhodobacter_sphaeroides,ok,Contig
+rhodococcus_equi,no_taxon,
+rhodococcus_erythropolis,ok,Contig
+rhodococcus_fascians,no_taxon,
+rhodococcus_globerulus,ok,Contig
+rhodococcus_opacus,ok,Contig
+rhodococcus_rhodochrous,ok,Contig
+rhodococcus_ruber,ok,Contig
+rhodopseudomonas_palustris,ok,Contig
+rhodospirillum_centenum,ok,Contig
+rhodothermus_marinus,ok,Contig
+riemerella_anatipestifer,ok,Contig
+roseobacter_denitrificans,ok,Contig
+roseobacter_litoralis,ok,Contig
+ruegeria_pomeroyi,ok,Contig
+saccharibacter_floricola,ok,Contig
+salinibacter_ruber,ok,Contig
+salinivibrio_costicola,ok,Contig
+salmonella_enterica,ok,Contig
+salmonella_enteritidis,ok,Contig
+salmonella_gallinarum,ok,Contig
+salmonella_paratyphi,ok,Contig
+salmonella_serovar,no_taxon,
+salmonella_typhi,ok,Contig
+salmonella_typhimurium,ok,Contig
+serratia_marcescens,ok,Contig
+serratia_rubidaea,ok,Contig
+shewanella baltica,ok,Contig
+shewanella fidelis,ok,Contig
+shewanella indica,ok,Contig
+shewanella inventionis,ok,Contig
+shewanella oneidensis,ok,Contig
+shewanella oneidensis mr-1,ok,Contig
+shewanella putrefaciens,ok,Contig
+shewanella sp.,ok,Contig
+shewanella sp. 10n.6,ok,Contig
+shewanella sp. 10n.7,ok,Contig
+shewanella sp. 4,ok,Contig
+shewanella sp. 40,ok,Contig
+shewanella sp. 41,no_assembly,
+shewanella sp. 44,no_assembly,
+shewanella sp. 49,no_assembly,
+shewanella sp. m16,ok,Contig
+shewanella xiamenensis,ok,Contig
+shigella_boydii,ok,Contig
+shigella_dysentriae,no_taxon,
+shigella_flexneri,ok,Contig
+shigella_sonnei,ok,Contig
+sinorhizobium_meliloti,ok,Contig
+sodalis_glossinidius,ok,Contig
+sphingomonas_paucimobilis,ok,Contig
+spiroplasma_citri,ok,Contig
+spiroplasma_kunkelii,ok,Contig
+spiroplasma_melliferum,ok,Contig
+staphylococcus_arlettae,ok,Contig
+staphylococcus_aureus,ok,Contig
+staphylococcus_auricularis,ok,Contig
+staphylococcus_capitis,ok,Contig
+staphylococcus_caprae,ok,Contig
+staphylococcus_carnosus,ok,Contig
+staphylococcus_chromogenes,ok,Contig
+staphylococcus_cohnii,ok,Contig
+staphylococcus_epidermidis,ok,Contig
+staphylococcus_equorum,ok,Contig
+staphylococcus_fleuretti,ok,Contig
+staphylococcus_haemolyticus,ok,Contig
+staphylococcus_hominis,ok,Contig
+staphylococcus_hyicus,ok,Contig
+staphylococcus_intermedius,ok,Contig
+staphylococcus_kloosii,ok,Contig
+staphylococcus_lentus,ok,Contig
+staphylococcus_lugdunensis,ok,Contig
+staphylococcus_nepalensis,ok,Contig
+staphylococcus_pasteuri,ok,Contig
+staphylococcus_pettenkoferi,ok,Contig
+staphylococcus_pseudintermedius,ok,Contig
+staphylococcus_saprophyticus,ok,Contig
+staphylococcus_schleiferi,ok,Contig
+staphylococcus_sciuri,no_taxon,
+staphylococcus_simulans,ok,Contig
+staphylococcus_succinus,ok,Contig
+staphylococcus_vitulinus,no_taxon,
+staphylococcus_warneri,ok,Contig
+staphylococcus_xylosis,no_taxon,
+staphylococcus_xylosus,ok,Contig
+streptococcus_dysgalactiae,ok,Contig
+streptococcus_equi,ok,Contig
+streptococcus_gordonii,ok,Contig
+streptococcus_mitis,ok,Contig
+streptococcus_mutans,ok,Contig
+streptococcus_oralis,ok,Contig
+streptococcus_parauberis,ok,Contig
+streptococcus_pyogenes,ok,Contig
+streptococcus_salivarius,ok,Contig
+streptococcus_sobrinus,ok,Contig
+streptococcus_suis,ok,Contig
+streptococcus_thermophilus,ok,Contig
+streptococcus_zooepidemicus,ok,Contig
+streptomyces_aureofaciens,no_taxon,
+streptomyces_avermitilis,ok,Contig
+streptomyces_azureus,ok,Contig
+streptomyces_coelicolor,ok,Contig
+streptomyces_exfoliatus,ok,Contig
+streptomyces_flavovirens,ok,Contig
+streptomyces_griseus,ok,Contig
+streptomyces_lividans,ok,Contig
+streptomyces_scabiei,ok,Contig
+streptomyces_venezuelae,ok,Contig
+streptomyces_viridochromogenes,ok,Contig
+tetrasphaera_jenkinsii,no_taxon,
+thermus_thermophilus,ok,Contig
+tsukamurella_paurometabola,ok,Contig
+vibrio alginolyticus,ok,Contig
+vibrio alginolyticus nbrc 15630 = atcc 17749,ok,Contig
+vibrio anguillarum,ok,Contig
+vibrio breoganii,ok,Contig
+vibrio campbellii,ok,Contig
+vibrio campbellii atcc baa-1116,ok,Contig
+vibrio campbellii caim 519 = nbrc 15631 = atcc 25920,ok,Contig
+vibrio campbellii hy01,ok,Contig
+vibrio chagasii,ok,Contig
+vibrio cholerae,ok,Contig
+vibrio cholerae o1,ok,Contig
+vibrio cholerae o1 biovar el tor,ok,Contig
+vibrio cholerae o139,ok,Contig
+vibrio coralliilyticus,ok,Contig
+vibrio coralliilyticus p1,ok,Contig
+vibrio crassostreae,ok,Contig
+vibrio cyclitrophicus,ok,Contig
+vibrio cyclitrophicus 1f273,ok,Contig
+vibrio cyclitrophicus 1f53,ok,Contig
+vibrio cyclitrophicus zf14,ok,Contig
+vibrio hangzhouensis,ok,Contig
+vibrio harveyi,ok,Contig
+vibrio hepatarius,ok,Contig
+vibrio hyugaensis,ok,Contig
+vibrio kanaloae,ok,Contig
+vibrio lentus,ok,Contig
+vibrio maritimus,ok,Contig
+vibrio mediterranei,ok,Contig
+vibrio metschnikovii,ok,Contig
+vibrio natriegens,ok,Contig
+vibrio natriegens nbrc 15636 = atcc 14048 = dsm 759,ok,Contig
+vibrio neocaledonicus,ok,Contig
+vibrio ordalii,ok,Contig
+vibrio owensii,ok,Contig
+vibrio parahaemolyticus,ok,Contig
+vibrio parahaemolyticus nbrc 12711,ok,Contig
+vibrio parahaemolyticus rimd 2210633,ok,Contig
+vibrio parahaemolyticus snuvps-1,ok,Contig
+vibrio pelagius,ok,Contig
+vibrio rotiferianus,ok,Contig
+vibrio rumoiensis,ok,Contig
+vibrio sagamiensis,ok,Contig
+vibrio sp.,ok,Contig
+vibrio sp. 10n.1,ok,Contig
+vibrio sp. 10n.2,ok,Contig
+vibrio sp. 10n.3,ok,Contig
+vibrio sp. 10n.4,ok,Contig
+vibrio sp. 10n.5,ok,Contig
+vibrio sp. 12a10,no_assembly,
+vibrio sp. 12g05,no_assembly,
+vibrio sp. f12,ok,Contig
+vibrio sp. f13,ok,Contig
+vibrio sp. st2,ok,Contig
+vibrio sp. yd21,no_assembly,
+vibrio sp. yd38,no_assembly,
+vibrio splendidus,ok,Contig
+vibrio tasmaniensis,ok,Contig
+vibrio tubiashii,ok,Contig
+vibrio variabilis,ok,Contig
+vibrio vulnificus,ok,Contig
+vibrio_fischeri,ok,Contig
+vibrio_fluvialis,ok,Contig
+vibrio_furnissii,ok,Contig
+vibrio_mimicus,ok,Contig
+weissella_cibaria,ok,Contig
+xanthomonas_arboricola,ok,Contig
+xanthomonas_campestris,ok,Contig
+xanthomonas_citri,ok,Contig
+xanthomonas_oryzae,ok,Contig
+xanthomonas_vesicatoria,ok,Contig
+xylella_fastidiosa,ok,Contig
+yersinia_aldovae,ok,Contig
+yersinia_bercovieri,ok,Contig
+yersinia_enterocolitica,ok,Contig
+yersinia_frederiksenii,ok,Contig
+yersinia_intermedia,ok,Contig
+yersinia_kristensenii,ok,Contig
+yersinia_pestis,ok,Contig
+yersinia_pseudotuberculosis,ok,Contig
+yersinia_rohdei,ok,Contig
+yersinia_ruckeri,ok,Contig
