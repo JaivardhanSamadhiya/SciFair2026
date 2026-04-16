@@ -210,8 +210,6 @@ def _fetch(url, timeout=90, retries=3, post=None):
 
 def _dl(url, dest, label=""):
     dest = Path(dest)
-    if dest.exists() and dest.stat().st_size > 500:
-        return True
     print(f"    GET {label or Path(url).name}")
     try:
         data = _fetch(url, timeout=180)
@@ -263,10 +261,6 @@ def _get_virushostdb():
 
 def _get_ncbi(max_rec=2000):
     dest = RAW_DIR / "ncbi_phage_hosts.json"
-    if dest.exists() and dest.stat().st_size > 100:
-        pairs = json.loads(dest.read_text(encoding="utf-8"))
-        print(f"    NCBI (cached): {len(pairs)} pairs")
-        return pairs
     try:
         data = _ncbi_post("esearch.fcgi", db="nuccore",
             term="(bacteriophage[Title] OR phage[Title]) AND complete genome[Title] AND 5000:500000[SLEN]",
@@ -298,11 +292,7 @@ def _get_ncbi(max_rec=2000):
 
 def _fetch_genbank_strains(accessions, batch_size=80, max_fetch=500):
     """Fetch host strain info from NCBI GenBank records (/host qualifier)."""
-    cache_path = RAW_DIR / "ncbi_strain_cache.json"
     strain_map = {}
-    if cache_path.exists():
-        try: strain_map = json.loads(cache_path.read_text(encoding="utf-8"))
-        except: pass
     to_fetch = [a for a in accessions
                 if a not in strain_map and re.sub(r"\.\d+$","",a) not in strain_map][:max_fetch]
     if not to_fetch:
@@ -332,8 +322,6 @@ def _fetch_genbank_strains(accessions, batch_size=80, max_fetch=500):
             time.sleep(0.5)
         except Exception as e:
             print(f"    Batch {start} strain fetch failed: {e}")
-    try: cache_path.write_text(json.dumps(strain_map), encoding="utf-8")
-    except: pass
     found = sum(1 for a in accessions if a in strain_map or re.sub(r"\.\d+$","",a) in strain_map)
     print(f"    Got strain info for {found}/{len(accessions)} phages")
     return strain_map
@@ -587,50 +575,42 @@ def _dl_genome(ftp_path, dest):
 
 species_list = sorted(dataset["host"].str.lower().str.strip().unique())
 _dl_log = FASTA_DIR/"host_download_log.csv"
-_already_done = (_dl_log.exists() and HOST_FASTA.is_file()
-    and HOST_FASTA.stat().st_size > 100_000_000)
-if _already_done:
-    print(f"  Host genomes already downloaded, skipping download step.")
-    print(f"  (Delete {_dl_log} to force re-download)")
-else:
-    dl_ok = 0
-    log_rows = []
-    for i, sp in enumerate(species_list, 1):
+dl_ok = 0
+log_rows = []
+for i, sp in enumerate(species_list, 1):
+    slug = re.sub(r"[^\w]","_",sp)
+    dest = HOST_FASTA_DIR / f"{slug}.fasta"
+    print(f"  [{i}/{len(species_list)}] {sp}")
+    tid = _taxon_id(sp)
+    if not tid:
+        log_rows.append({"species":sp,"status":"no_taxon"})
+        print(f"    \u2717 taxon not found"); continue
+    asm = _best_assembly(tid)
+    if not asm:
+        log_rows.append({"species":sp,"status":"no_assembly"})
+        print(f"    \u2717 no assembly"); continue
+    ok = _dl_genome(asm["ftp"], dest)
+    if ok:
+        dl_ok += 1
+        log_rows.append({'species':sp,'status':'ok','level':asm['level']})
+        print(f"    \u2713 {asm['level']}")
+    else:
+        log_rows.append({'species':sp,'status':'dl_failed'})
+        print(f"    \u2717 download failed")
+pd.DataFrame(log_rows).to_csv(_dl_log, index=False)
+print(f"  Downloaded {dl_ok}/{len(species_list)} host genomes")
+with open(HOST_FASTA, "w") as out:
+    for sp in species_list:
         slug = re.sub(r"[^\w]","_",sp)
-        dest = HOST_FASTA_DIR / f"{slug}.fasta"
-        if dest.exists() and dest.stat().st_size > 500:
-            dl_ok += 1; continue
-        print(f"  [{i}/{len(species_list)}] {sp}")
-        tid = _taxon_id(sp)
-        if not tid:
-            log_rows.append({"species":sp,"status":"no_taxon"})
-            print(f"    \u2717 taxon not found"); continue
-        asm = _best_assembly(tid)
-        if not asm:
-            log_rows.append({"species":sp,"status":"no_assembly"})
-            print(f"    \u2717 no assembly"); continue
-        ok = _dl_genome(asm["ftp"], dest)
-        if ok:
-            dl_ok += 1
-            log_rows.append({'species':sp,'status':'ok','level':asm['level']})
-            print(f"    \u2713 {asm['level']}")
-        else:
-            log_rows.append({'species':sp,'status':'dl_failed'})
-            print(f"    \u2717 download failed")
-    pd.DataFrame(log_rows).to_csv(_dl_log, index=False)
-    print(f"  Downloaded {dl_ok}/{len(species_list)} host genomes")
-    with open(HOST_FASTA, "w") as out:
-        for sp in species_list:
-            slug = re.sub(r"[^\w]","_",sp)
-            fp   = HOST_FASTA_DIR / f"{slug}.fasta"
-            if not fp.exists(): continue
-            flines = fp.read_text().splitlines()
-            first_header = True
-            for line in flines:
-                if line.startswith(">") and first_header:
-                    out.write(f">{sp} {line[1:]}\n"); first_header=False
-                else: out.write(line+"\n")
-    print(f"  Concatenated \u2192 {HOST_FASTA.name}  ({HOST_FASTA.stat().st_size//1024} KB)")
+        fp   = HOST_FASTA_DIR / f"{slug}.fasta"
+        if not fp.exists(): continue
+        flines = fp.read_text().splitlines()
+        first_header = True
+        for line in flines:
+            if line.startswith(">") and first_header:
+                out.write(f">{sp} {line[1:]}\n"); first_header=False
+            else: out.write(line+"\n")
+print(f"  Concatenated \u2192 {HOST_FASTA.name}  ({HOST_FASTA.stat().st_size//1024} KB)")
 
 
 # ════════════════════════════════════════════════════════════════
@@ -793,14 +773,11 @@ else:
                         list(_pfp_check.glob("*.ffn")))
         if _fasta_files:
             _concat_dest = _pfp_check.parent / "phage_genomes_concat.fasta"
-            if not _concat_dest.exists():
-                print(f"  Auto-concatenating {len(_fasta_files)} phage FASTA files...")
-                with open(_concat_dest, "w") as _cout:
-                    for _ff in sorted(_fasta_files):
-                        _cout.write(_ff.read_text(errors="replace"))
-                print(f"  Concatenated → {_concat_dest.name}")
-            else:
-                print(f"  Using existing concat: {_concat_dest.name}")
+            print(f"  Auto-concatenating {len(_fasta_files)} phage FASTA files...")
+            with open(_concat_dest, "w") as _cout:
+                for _ff in sorted(_fasta_files):
+                    _cout.write(_ff.read_text(errors="replace"))
+            print(f"  Concatenated → {_concat_dest.name}")
             PHAGE_FASTA = str(_concat_dest)
     _pfp = Path(PHAGE_FASTA)
     if _pfp.is_file():
@@ -901,16 +878,10 @@ if _missing_accs:
     print(f"  Attempting NCBI download for {len(_missing_accs)} missing accessions...")
     _ncbi_fasta_cache = RAW_DIR / "ncbi_phage_seqs.fasta"
     _ncbi_cache = {}
-    if _ncbi_fasta_cache.is_file():
-        try: _ncbi_cache = _parse_fasta(str(_ncbi_fasta_cache))
-        except: pass
     _ncbi_cache_index = _build_seq_index(_ncbi_cache)
     _newly_fetched = 0
-    _ncbi_out = open(_ncbi_fasta_cache, "a")
+    _ncbi_out = open(_ncbi_fasta_cache, "w", encoding="utf-8")
     for _acc in _missing_accs[:500]:
-        _acc_base = re.sub(r"\.\d+$","",_acc)
-        if _acc_base in _ncbi_cache or _acc in _ncbi_cache:
-            continue
         try:
             _url = (f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
                     f"?db=nuccore&id={_acc}&rettype=fasta&retmode=text"
@@ -951,7 +922,7 @@ if _missing_accs:
                 _backfilled += 1
         print(f"  Back-filled features for {_backfilled} phages")
     else:
-        print(f"  NCBI: no new sequences found (all already cached or network unavailable)")
+        print(f"  NCBI: no new sequences fetched (network or parsing issue)")
 
 # Keep raw tet/cub vectors for pair-level features (same coordinate space for phage & host)
 tet_arr_raw = np.vstack(tet_vecs)   # (n_phages, 256) — full tetranucleotide frequencies
@@ -1199,7 +1170,7 @@ else:
 # ════════════════════════════════════════════════════════════════
 print("\n[5] Training classical ML models...")
 
-# Build flat feature matrix (needed whether cached or not)
+# Build flat feature matrix
 all_feat_cols = NUMERIC_FEATS + _rich + (ph_feat_cols[:32] if len(ph_feat_cols)>0 else [])
 all_feat_cols = [c for c in all_feat_cols if c in dataset.columns]
 X_all = dataset[all_feat_cols].fillna(0.0).values.astype(np.float32)
@@ -1215,56 +1186,42 @@ valid_species = sorted([sp for sp in dataset["host"].unique()
     and (dataset.loc[dataset["host"]==sp,"label"]==0).sum() >= 3])
 print(f"  {len(valid_species)} valid species for evaluation")
 
-_clf_cache = RESULTS_DIR / "classical_xgboost_loso.csv"
-if _clf_cache.exists():
-    print("  Classical results already cached — loading from CSV, skipping retraining.")
-    clf_results = {}
-    for _mn, _fn in [("XGBoost","classical_xgboost_loso.csv"),
-                     ("RandomForest","classical_randomforest_loso.csv"),
-                     ("GBM","classical_gbm_loso.csv")]:
-        _fp = RESULTS_DIR / _fn
-        if _fp.exists():
-            _df = pd.read_csv(_fp, index_col="species")
-            clf_results[_mn] = {"df":_df, "mean":_df["roc_auc"].mean(),
-                                 "probas":np.full(len(dataset), np.nan), "pooled":{}}
-            print(f"  {_mn}: LOSO mean AUC={_df['roc_auc'].mean():.4f}  ({len(_df)} folds) [cached]")
-else:
-    def run_classical_loso(model_name, make_model):
-        rows=[]; probas=np.full(len(dataset),np.nan)
-        for sp in valid_species:
-            tm=(dataset["host"]==sp).values
-            # FIX-B: fit scaler on training fold only to prevent leakage
-            _fold_sc = StandardScaler()
-            Xtr = _fold_sc.fit_transform(X_all[~tm])
-            Xte = _fold_sc.transform(X_all[tm])
-            ytr, yte = y_all[~tm], y_all[tm]
-            if len(np.unique(yte))<2: continue
-            clf = make_model()
-            clf.fit(Xtr,ytr)
-            p = clf.predict_proba(Xte)[:,1]
-            probas[tm]=p
-            m=metrics(yte,p); m["species"]=sp; m["n_test"]=int(tm.sum())
-            rows.append(m)
-        df=pd.DataFrame(rows).set_index("species")
-        vm=~np.isnan(probas)
-        pooled=metrics(y_all[vm],probas[vm]) if vm.sum()>10 and len(np.unique(y_all[vm]))==2 else {}
-        mean_auc=df["roc_auc"].mean() if len(df)>0 else 0.0
-        print(f"  {model_name}: LOSO mean AUC={mean_auc:.4f}  pooled={pooled.get('roc_auc',0):.4f}  ({len(df)} folds)")
-        df.to_csv(RESULTS_DIR/f"classical_{model_name.lower().replace(' ','_')}_loso.csv")
-        return {"df":df,"mean":mean_auc,"probas":probas,"pooled":pooled}
+def run_classical_loso(model_name, make_model):
+    rows=[]; probas=np.full(len(dataset),np.nan)
+    for sp in valid_species:
+        tm=(dataset["host"]==sp).values
+        # FIX-B: fit scaler on training fold only to prevent leakage
+        _fold_sc = StandardScaler()
+        Xtr = _fold_sc.fit_transform(X_all[~tm])
+        Xte = _fold_sc.transform(X_all[tm])
+        ytr, yte = y_all[~tm], y_all[tm]
+        if len(np.unique(yte))<2: continue
+        clf = make_model()
+        clf.fit(Xtr,ytr)
+        p = clf.predict_proba(Xte)[:,1]
+        probas[tm]=p
+        m=metrics(yte,p); m["species"]=sp; m["n_test"]=int(tm.sum())
+        rows.append(m)
+    df=pd.DataFrame(rows).set_index("species")
+    vm=~np.isnan(probas)
+    pooled=metrics(y_all[vm],probas[vm]) if vm.sum()>10 and len(np.unique(y_all[vm]))==2 else {}
+    mean_auc=df["roc_auc"].mean() if len(df)>0 else 0.0
+    print(f"  {model_name}: LOSO mean AUC={mean_auc:.4f}  pooled={pooled.get('roc_auc',0):.4f}  ({len(df)} folds)")
+    df.to_csv(RESULTS_DIR/f"classical_{model_name.lower().replace(' ','_')}_loso.csv")
+    return {"df":df,"mean":mean_auc,"probas":probas,"pooled":pooled}
 
-    clf_results={}
-    if HAS_XGB:
-        clf_results["XGBoost"] = run_classical_loso("XGBoost",
-            lambda: xgb.XGBClassifier(n_estimators=(400 if _THOROUGH else 220),max_depth=6,learning_rate=0.05,
-                subsample=0.8,colsample_bytree=0.8,random_state=SEED,
-                eval_metric="logloss",verbosity=0))
-    clf_results["RandomForest"] = run_classical_loso("RandomForest",
-        lambda: RandomForestClassifier(n_estimators=(400 if _THOROUGH else 220),max_depth=8,
-            min_samples_leaf=2,random_state=SEED,n_jobs=-1))
-    clf_results["GBM"] = run_classical_loso("GBM",
-        lambda: HistGradientBoostingClassifier(max_iter=(280 if _THOROUGH else 160),max_depth=5,
-            learning_rate=0.05,random_state=SEED))
+clf_results={}
+if HAS_XGB:
+    clf_results["XGBoost"] = run_classical_loso("XGBoost",
+        lambda: xgb.XGBClassifier(n_estimators=(400 if _THOROUGH else 220),max_depth=6,learning_rate=0.05,
+            subsample=0.8,colsample_bytree=0.8,random_state=SEED,
+            eval_metric="logloss",verbosity=0))
+clf_results["RandomForest"] = run_classical_loso("RandomForest",
+    lambda: RandomForestClassifier(n_estimators=(400 if _THOROUGH else 220),max_depth=8,
+        min_samples_leaf=2,random_state=SEED,n_jobs=-1))
+clf_results["GBM"] = run_classical_loso("GBM",
+    lambda: HistGradientBoostingClassifier(max_iter=(280 if _THOROUGH else 160),max_depth=5,
+        learning_rate=0.05,random_state=SEED))
 
 
 # ════════════════════════════════════════════════════════════════
@@ -1610,34 +1567,10 @@ def run_gnn_pipeline(arch):
     print(f"\n  ── {ARCH_LABEL[arch]} ──")
 
     _loso_cache_path = RESULTS_DIR / f"gnn_{arch.lower()}_loso.csv"
-    _pred_cache_path = RESULTS_DIR / f"predictions_{arch.lower()}.csv"
-    if _loso_cache_path.exists():
-        _done_df = pd.read_csv(_loso_cache_path, index_col="species")
-        loso_rows = _done_df.reset_index().to_dict("records")
-    else:
-        _done_df = pd.DataFrame()
-        loso_rows = []
-    _done_species = set(_done_df.index.tolist()) if len(_done_df) else set()
+    loso_rows = []
     all_proba = np.full(len(dataset), np.nan)
-
-    # Reload cached predictions (fast vectorised merge)
-    if _pred_cache_path.exists() and len(_done_species):
-        _pred_cache = pd.read_csv(_pred_cache_path)
-        if "proba" in _pred_cache.columns and "host" in _pred_cache.columns:
-            _merged = dataset[["phage","host"]].reset_index().merge(
-                _pred_cache[["phage","host","proba"]], on=["phage","host"], how="left")
-            _merged = _merged.set_index("index").sort_index()
-            all_proba = _merged["proba"].values.astype(np.float64)
-            _n_restored = np.isfinite(all_proba).sum()
-            if _n_restored == 0 and len(_done_species) > 0:
-                print(f"  WARNING: predictions cache is stale/empty — will re-run all folds")
-                _done_species = set()
-                loso_rows = []
-
-    _remaining = [sp for sp in valid_species if sp not in _done_species]
-    if _done_species:
-        print(f"  Resuming: {len(_done_species)} species cached, {len(_remaining)} remaining")
-    print(f"  LOSO ({len(valid_species)} species, {len(_remaining)} remaining)...")
+    _remaining = list(valid_species)
+    print(f"  LOSO ({len(valid_species)} species)...")
     t0=time.time()
     for sp in _remaining:
         tm = (dataset["host"]==sp).values
@@ -1658,20 +1591,11 @@ def run_gnn_pipeline(arch):
     pred_df["proba"] = all_proba[vm]
     pred_df.to_csv(RESULTS_DIR/f"predictions_{arch.lower()}.csv", index=False)
 
-    # LOGO (resume from partial CSV if present)
     _logo_path = RESULTS_DIR / f"gnn_{arch.lower()}_logo.csv"
-    if _logo_path.exists():
-        _logo_prev = pd.read_csv(_logo_path, index_col="genus")
-        logo_rows = _logo_prev.reset_index().to_dict("records")
-        _logo_done = set(_logo_prev.index.tolist())
-        print(f"  LOGO ({len(evaluable_genera)} genera, {len(_logo_done)} cached)...")
-    else:
-        logo_rows = []
-        _logo_done = set()
-        print(f"  LOGO ({len(evaluable_genera)} genera)...")
+    logo_rows = []
+    print(f"  LOGO ({len(evaluable_genera)} genera)...")
     t1=time.time()
     for genus in evaluable_genera:
-        if genus in _logo_done: continue
         tm = (dataset["genus"]==genus).values
         if all_labels[tm].sum()<2: continue
         proba, yte = run_fold(~tm, tm, arch=arch)
@@ -1684,7 +1608,7 @@ def run_gnn_pipeline(arch):
     logo_mean = logo_df["roc_auc"].mean() if len(logo_df) else 0.0
     print(f"  LOGO {time.time()-t1:.0f}s  mean={logo_mean:.4f}")
     if len(logo_df) == 0:
-        print(f"  WARNING: {arch} LOGO produced no results — delete cache to regenerate")
+        print(f"  WARNING: {arch} LOGO produced no results")
 
     # Unseen Strain
     print(f"  Unseen Strain ({N_MC_ROUNDS} rounds)...")
@@ -1743,56 +1667,9 @@ def run_gnn_pipeline(arch):
             "mc_df":mc_df,"mc_auc":mc_auc,"ctail_df":ctail_df,
             "means_c":means_c,"pct75_c":pct75_c,"pred_df":pred_df,"all_proba":all_proba}
 
-_gnn_loso_file   = RESULTS_DIR / "gnn_gat_loso.csv"
-_gnn_unseen_file = RESULTS_DIR / "gnn_gat_unseen.csv"
-_gnn_ctail_file  = RESULTS_DIR / "gnn_gat_cocktail.csv"
-_loso_done   = _gnn_loso_file.exists()
-_unseen_done = _gnn_unseen_file.exists() and _gnn_unseen_file.stat().st_size > 50
-_ctail_done  = _gnn_ctail_file.exists()  and _gnn_ctail_file.stat().st_size  > 50
-_sage_loso_file = RESULTS_DIR / "gnn_sage_loso.csv"
-_sage_done   = _sage_loso_file.exists()
-
 gnn_results={}
-if _loso_done and _unseen_done and _ctail_done and _sage_done:
-    print("  GNN results already cached — loading from CSV, skipping retraining.")
-    for _arch in ["GAT", "SAGE"]:
-        _a = _arch.lower()
-        def _safe_read(path, **kwargs):
-            try:
-                df = pd.read_csv(path, **kwargs)
-                return df if len(df) > 0 else pd.DataFrame()
-            except Exception:
-                return pd.DataFrame()
-        _loso_df  = pd.read_csv(RESULTS_DIR/f"gnn_{_a}_loso.csv", index_col="species")
-        _logo_df  = _safe_read(RESULTS_DIR/f"gnn_{_a}_logo.csv",    index_col="genus")  if (RESULTS_DIR/f"gnn_{_a}_logo.csv").exists()    else pd.DataFrame()
-        _mc_df    = _safe_read(RESULTS_DIR/f"gnn_{_a}_unseen.csv")                       if (RESULTS_DIR/f"gnn_{_a}_unseen.csv").exists()   else pd.DataFrame()
-        _ctail_df = _safe_read(RESULTS_DIR/f"gnn_{_a}_cocktail.csv")                     if (RESULTS_DIR/f"gnn_{_a}_cocktail.csv").exists() else pd.DataFrame()
-        _pred_df  = _safe_read(RESULTS_DIR/f"predictions_{_a}.csv")                      if (RESULTS_DIR/f"predictions_{_a}.csv").exists()  else pd.DataFrame()
-
-        # FIX: fast vectorised proba reload
-        _all_proba = np.full(len(dataset), np.nan)
-        if len(_pred_df) and "proba" in _pred_df.columns:
-            _merged2 = dataset[["phage","host"]].reset_index().merge(
-                _pred_df[["phage","host","proba"]], on=["phage","host"], how="left")
-            _merged2 = _merged2.set_index("index").sort_index()
-            _all_proba = _merged2["proba"].values.astype(np.float64)
-
-        _loso_mean = _loso_df["roc_auc"].mean(); _loso_std = _loso_df["roc_auc"].std()
-        _logo_mean = _logo_df["roc_auc"].mean() if len(_logo_df) else 0.0
-        _mc_auc    = _mc_df["auc"].mean()        if len(_mc_df)   else 0.0
-        _strats  = ["single","topk","random","greedy"]
-        _means_c = {s: _ctail_df[f"{s}_cov"].mean() for s in _strats} if len(_ctail_df) else {s:0.0 for s in _strats}
-        _pct75_c = {s: (_ctail_df[f"{s}_cov"]>=0.75).mean()*100 for s in _strats} if len(_ctail_df) else {s:0.0 for s in _strats}
-        _vm_cached = ~np.isnan(_all_proba)
-        _loso_pooled = metrics(all_labels[_vm_cached], _all_proba[_vm_cached]) if _vm_cached.sum() > 10 and len(np.unique(all_labels[_vm_cached])) == 2 else {"roc_auc": _loso_mean}
-        gnn_results[_arch] = {"arch":_arch,"loso_df":_loso_df,"loso_mean":_loso_mean,
-            "loso_std":_loso_std,"loso_pooled":_loso_pooled,"logo_df":_logo_df,
-            "logo_mean":_logo_mean,"mc_df":_mc_df,"mc_auc":_mc_auc,"ctail_df":_ctail_df,
-            "means_c":_means_c,"pct75_c":_pct75_c,"pred_df":_pred_df,"all_proba":_all_proba}
-        print(f"  {_arch}: LOSO={_loso_mean:.4f}±{_loso_std:.4f}  LOGO={_logo_mean:.4f}  Unseen={_mc_auc:.4f} [cached]")
-else:
-    for _arch in ["GAT", "SAGE"]:
-        gnn_results[_arch]=run_gnn_pipeline(_arch)
+for _arch in ["GAT", "SAGE"]:
+    gnn_results[_arch]=run_gnn_pipeline(_arch)
 
 # FIX-C: Report BOTH architectures as primary results.  best_gnn is used only for
 # downstream tasks (cocktail, cross-DB) where a single model is needed, NOT for
@@ -2406,11 +2283,6 @@ print("\n[9] Cross-database validation...")
 
 def _fetch_phagesdb():
     """Fetch phage-host pairs from PhagesDB for external validation."""
-    cache = RAW_DIR / "phagesdb_pairs.json"
-    if cache.exists() and cache.stat().st_size > 100:
-        pairs = json.loads(cache.read_text(encoding="utf-8"))
-        print(f"  PhagesDB (cached): {len(pairs)} pairs")
-        return pairs
     pairs = []
     for page in range(1, 60):
         try:
@@ -2442,10 +2314,6 @@ def _fetch_phagesdb():
         except Exception as e:
             print(f"  PhagesDB page {page}: {e}")
             break
-    try:
-        cache.write_text(json.dumps(pairs), encoding="utf-8")
-    except Exception:
-        pass
     print(f"  PhagesDB: {len(pairs)} pairs fetched")
     return pairs
 
@@ -2562,39 +2430,27 @@ if _phagesdb_pairs:
 
 # GPDB external validation
 print("  Fetching GPDB pairs for external validation...")
-_gpdb_cache = RAW_DIR / "gpdb_pairs.json"
 _gpdb_pairs = []
-if _gpdb_cache.exists() and _gpdb_cache.stat().st_size > 100:
+for _page in range(1, 40):
     try:
-        _gpdb_pairs = json.loads(_gpdb_cache.read_text(encoding="utf-8"))
-        print(f"  GPDB (cached): {len(_gpdb_pairs)} pairs")
-    except Exception:
-        pass
-if not _gpdb_pairs:
-    for _page in range(1, 40):
-        try:
-            _url = f"https://gpd.phasodb.org/api/phages?page={_page}&per_page=500"
-            _raw = _fetch(_url, timeout=60)
-            _data = json.loads(_raw.decode("utf-8"))
-            _results = _data.get("data", _data.get("results", []))
-            if not _results: break
-            for _rec in _results:
-                _acc  = (_rec.get("accession","") or _rec.get("genbank_accession","") or "").strip()
-                _host = (_rec.get("host","") or _rec.get("host_genus","") or "").strip()
-                _name = (_rec.get("name","") or _rec.get("phage_name","") or "").strip()
-                if not _host or not (_acc or _name): continue
-                _h = _clean_host(_host)
-                if len(_h.split()) < 1: continue
-                _gpdb_pairs.append({"phage": _acc or _name, "phage_name": _name,
-                                    "host": _h, "source": "gpdb"})
-            time.sleep(0.4)
-        except Exception as e:
-            print(f"  GPDB page {_page}: {e}"); break
-    try:
-        _gpdb_cache.write_text(json.dumps(_gpdb_pairs), encoding="utf-8")
-    except Exception:
-        pass
-    print(f"  GPDB: {len(_gpdb_pairs)} pairs fetched")
+        _url = f"https://gpd.phasodb.org/api/phages?page={_page}&per_page=500"
+        _raw = _fetch(_url, timeout=60)
+        _data = json.loads(_raw.decode("utf-8"))
+        _results = _data.get("data", _data.get("results", []))
+        if not _results: break
+        for _rec in _results:
+            _acc  = (_rec.get("accession","") or _rec.get("genbank_accession","") or "").strip()
+            _host = (_rec.get("host","") or _rec.get("host_genus","") or "").strip()
+            _name = (_rec.get("name","") or _rec.get("phage_name","") or "").strip()
+            if not _host or not (_acc or _name): continue
+            _h = _clean_host(_host)
+            if len(_h.split()) < 1: continue
+            _gpdb_pairs.append({"phage": _acc or _name, "phage_name": _name,
+                                "host": _h, "source": "gpdb"})
+        time.sleep(0.4)
+    except Exception as e:
+        print(f"  GPDB page {_page}: {e}"); break
+print(f"  GPDB: {len(_gpdb_pairs)} pairs fetched")
 
 if _gpdb_pairs:
     _gpdb_df = pd.DataFrame(_gpdb_pairs)
